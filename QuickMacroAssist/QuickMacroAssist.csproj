@@ -1,0 +1,26 @@
+﻿<Project Sdk="MSBuild.Sdk.Extras/1.6.68">
+  <PropertyGroup>
+    <TargetFramework>net461</TargetFramework>
+    <ExtrasEnableWpfProjectSetup>true</ExtrasEnableWpfProjectSetup>
+	<ApplicationIcon />
+    <OutputType>WinExe</OutputType>
+    <StartupObject />
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>bin\Debug\net471\WpfPowerfulFoundation.xml</DocumentationFile>
+    <LangVersion>latest</LangVersion>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\Release\net471\WpfPowerfulFoundation.xml</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="FrHello.NetLib.Core.Wpf" Version="1.1.26" />
+    <PackageReference Include="MahApps.Metro" Version="1.6.5" />
+    <PackageReference Include="NLog.Config" Version="4.6.7" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CoreFx\CoreFx.csproj" />
+    <ProjectReference Include="..\WpfViews\WpfViews.csproj" />
+  </ItemGroup>
+</Project>
