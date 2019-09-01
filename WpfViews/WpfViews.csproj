@@ -10,6 +10,7 @@
   <ItemGroup>
     <Folder Include="Controls\IconFontWpfs\" />
     <Folder Include="Themes\LoadingControl\" />
+    <Folder Include="Views\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FrHello.NetLib.Core.Mvx" Version="1.0.21" />

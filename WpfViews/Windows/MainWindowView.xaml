@@ -6,9 +6,26 @@
                  xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
                  xmlns:iconFontWpfs="clr-namespace:WpfViews.Controls.IconFontWpfs"
                  xmlns:hintHand="clr-namespace:WpfViews.Controls.HintHand"
+                 xmlns:models="clr-namespace:Models;assembly=Models"
+                 xmlns:uiConverters="clr-namespace:FrHello.NetLib.Core.Wpf.UiConverters;assembly=NetLib.Core.Wpf"
                  mc:Ignorable="d"
                  Title="Quick Macro Assist"
                  d:DesignHeight="450" d:DesignWidth="800">
+    <mah:MetroWindow.Resources>
+        <DataTemplate x:Key="ScreenInfoDataTemplate" DataType="models:ScreenInfo">
+            <Border BorderThickness="1" BorderBrush="{DynamicResource AccentColorBrush}" Padding="5" Margin="-5,0,0,0">
+                <Grid HorizontalAlignment="Center">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="3" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Text="{Binding Name}" FontWeight="Bold" HorizontalAlignment="Center"/>
+                    <TextBlock Grid.Row="2" Text="{Binding SizeInfo}" HorizontalAlignment="Center"/>
+                </Grid>
+            </Border>
+        </DataTemplate>
+    </mah:MetroWindow.Resources>
     <Border Padding="10">
         <Grid>
             <Grid.RowDefinitions>
@@ -21,9 +38,17 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <Label Grid.Column="0" Content="屏幕：" />
-                <ListBox Grid.Column="1" ItemsSource="{Binding Screens}" />
-                <Button Grid.Column="2" Content="截屏" Command="{Binding CaptureCommand}"/>
+                <Label Grid.Column="0" Content="屏幕：" VerticalAlignment="Center"/>
+                <ListBox Grid.Column="1" ItemsSource="{Binding Screens}" VerticalAlignment="Center" ItemTemplate="{StaticResource ScreenInfoDataTemplate}"
+                         SelectedItem="{Binding SelectedScreenInfo}">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel />
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                </ListBox>
+                <Button Grid.Column="2" Content="截屏" Command="{Binding CaptureCommand}" 
+                        IsEnabled="{Binding SelectedScreenInfo, Converter={x:Static uiConverters:SuperConverterProvider.SuperConverter}}"  Margin="5"/>
             </Grid>
         </Grid>
     </Border>
