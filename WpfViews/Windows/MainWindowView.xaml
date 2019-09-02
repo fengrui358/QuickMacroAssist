@@ -10,7 +10,7 @@
                  xmlns:modelsFx="clr-namespace:ModelsFx;assembly=ModelsFx"
                  mc:Ignorable="d"
                  Title="Quick Macro Assist"
-                 d:DesignHeight="450" d:DesignWidth="800">
+                 d:DesignHeight="450" d:DesignWidth="800" Loaded="MainWindowView_OnLoaded">
     <mah:MetroWindow.InputBindings>
         <KeyBinding Key="F12" Command="{Binding CaptureCommand}" />
     </mah:MetroWindow.InputBindings>
@@ -60,7 +60,10 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" MinWidth="165" />
                 </Grid.ColumnDefinitions>
-                <Image Grid.Column="0" Source="{Binding SelectedScreenInfo.Capture}" Margin="5" />
+                <Grid Margin="5">
+                    <Image x:Name="ScreenImage" Grid.Column="0" Source="{Binding SelectedScreenInfo.Capture}" Margin="5" />
+                    <Canvas x:Name="Mask" Background="Transparent" />
+                </Grid>
                 <Border Grid.Column="1" BorderThickness="1" BorderBrush="{DynamicResource AccentColorBrush}"
                         Padding="5">
                     <Grid>
