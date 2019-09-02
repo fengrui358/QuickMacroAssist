@@ -53,6 +53,28 @@
                 <Button Grid.Column="2" Content="截屏" Command="{Binding CaptureCommand}" 
                         IsEnabled="{Binding SelectedScreenInfo, Converter={x:Static uiConverters:SuperConverterProvider.SuperConverter}}"  Margin="5"/>
             </Grid>
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Image Grid.Column="0" Source="{Binding SelectedScreenInfo.Capture}" Margin="5"/>
+                <Border Grid.Column="1" BorderThickness="1" BorderBrush="{DynamicResource AccentColorBrush}" Padding="5">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <CheckBox Grid.Column="0" Content="局部查找" />
+                        </Grid>
+                    </Grid>
+                </Border>
+            </Grid>
         </Grid>
     </Border>
 </mah:MetroWindow>
