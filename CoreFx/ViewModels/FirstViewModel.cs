@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Threading.Tasks;
 using FrHello.NetLib.Core.Mvx;
 using FrHello.NetLib.Core.Windows.Windows;
-using Models;
+using ModelsFx;
 using MvvmCross.Commands;
 
 namespace CoreFx.ViewModels
@@ -39,7 +38,10 @@ namespace CoreFx.ViewModels
 
         private void CaptureCommandHandler()
         {
-            
+            if (SelectedScreenInfo != null)
+            {
+
+            }
         }
 
         private void RefreshScreens()
@@ -48,15 +50,15 @@ namespace CoreFx.ViewModels
 
             for (var i = 0; i < WindowsApi.ScreenApi.AllScreens.Length; i++)
             {
-                screens.Add(new ScreenInfo
-                {
-                    Index = i,
-                    Primary = WindowsApi.ScreenApi.AllScreens[i].Primary,
-                    Rectangle = WindowsApi.ScreenApi.AllScreens[i].Bounds
-                });
+                screens.Add(new ScreenInfo(i + 1, WindowsApi.ScreenApi.AllScreens[i]));
             }
 
             Screens = new ObservableCollection<ScreenInfo>(screens);
+        }
+
+        private void OnSelectedScreenInfoChanged()
+        {
+            CaptureCommandHandler();
         }
     }
 }

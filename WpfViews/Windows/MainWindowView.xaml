@@ -6,13 +6,16 @@
                  xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
                  xmlns:iconFontWpfs="clr-namespace:WpfViews.Controls.IconFontWpfs"
                  xmlns:hintHand="clr-namespace:WpfViews.Controls.HintHand"
-                 xmlns:models="clr-namespace:Models;assembly=Models"
                  xmlns:uiConverters="clr-namespace:FrHello.NetLib.Core.Wpf.UiConverters;assembly=NetLib.Core.Wpf"
+                 xmlns:modelsFx="clr-namespace:ModelsFx;assembly=ModelsFx"
                  mc:Ignorable="d"
                  Title="Quick Macro Assist"
                  d:DesignHeight="450" d:DesignWidth="800">
+    <mah:MetroWindow.InputBindings>
+        <KeyBinding Key="F12" Command="{Binding CaptureCommand}" />
+    </mah:MetroWindow.InputBindings>
     <mah:MetroWindow.Resources>
-        <DataTemplate x:Key="ScreenInfoDataTemplate" DataType="models:ScreenInfo">
+        <DataTemplate x:Key="ScreenInfoDataTemplate" DataType="modelsFx:ScreenInfo">
             <Border BorderThickness="1" BorderBrush="{DynamicResource AccentColorBrush}" Padding="5" Margin="-5,0,0,0">
                 <Grid HorizontalAlignment="Center">
                     <Grid.RowDefinitions>

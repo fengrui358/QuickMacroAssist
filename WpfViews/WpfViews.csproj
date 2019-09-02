@@ -20,7 +20,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
     <ProjectReference Include="..\DataBase\DataBase.csproj" />
-    <ProjectReference Include="..\Models\Models.csproj" />
+    <ProjectReference Include="..\ModelsFx\ModelsFx.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
