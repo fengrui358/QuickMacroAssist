@@ -66,7 +66,7 @@ namespace WpfViews.Windows
 
                     foreach (var colorInfo in colorInfos)
                     {
-                        var colorRectangle = new ColorRectangle(colorInfo, Mask);
+                        //var colorRectangle = new ColorRectangle(colorInfo, Mask);
                     }
                 }
             }

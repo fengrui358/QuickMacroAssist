@@ -55,7 +55,7 @@ namespace CoreFx.ViewModels
                 }
             }
 
-            await RaisePropertyChanged(nameof(SelectedScreenInfo));
+            //await RaisePropertyChanged(nameof(SelectedScreenInfo));
         }
 
         private void RefreshScreens()
