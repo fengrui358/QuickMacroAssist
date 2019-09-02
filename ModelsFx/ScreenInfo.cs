@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Media.Imaging;
 
@@ -9,6 +13,9 @@ namespace ModelsFx
 {
     public class ScreenInfo
     {
+        private Bitmap _bitmap;
+        private List<ColorInfo> _uniqueColorInfos = new List<ColorInfo>();
+
         [DllImport("gdi32.dll", CharSet = CharSet.Auto, SetLastError = true, ExactSpelling = true)]
         private static extern int BitBlt(IntPtr hDc, int x, int y, int nWidth, int nHeight, IntPtr hSrcDc, int xSrc, int ySrc, int dwRop);
 
@@ -49,8 +56,16 @@ namespace ModelsFx
 
         public BitmapImage Capture { get; private set; }
 
+        private void Clear()
+        {
+            _bitmap = null;
+            Capture = null;
+            _uniqueColorInfos.Clear();
+        }
+
         public void CaptureProcess()
         {
+            Clear();
             var screenPixel = new Bitmap(Screen.Bounds.Width, Screen.Bounds.Height, PixelFormat.Format32bppArgb);
 
             using (var dest = Graphics.FromImage(screenPixel))
@@ -66,7 +81,48 @@ namespace ModelsFx
                 }
             }
 
-            Capture = BitmapToImage(screenPixel);
+            _bitmap = screenPixel;
+            Capture = BitmapToImage(_bitmap);
+        }
+
+        public async Task<List<ColorInfo>> ScanAllUniqueColors(CancellationToken cancellationToken)
+        {
+            if (_bitmap != null)
+            {
+                var uniqueColors = new HashSet<ColorInfo>();
+                var repeatColors = new HashSet<ColorInfo>();
+
+                return await Task.Run(() =>
+                {
+                    for (var i = 0; i < _bitmap.Width; i++)
+                    {
+                        for (var j = 0; j < _bitmap.Height; j++)
+                        {
+                            cancellationToken.ThrowIfCancellationRequested();
+
+                            var color = _bitmap.GetPixel(i, j);
+                            var colorInfo = new ColorInfo(this, color, new Point(i, j));
+                            if (!repeatColors.Contains(colorInfo))
+                            {
+                                if (uniqueColors.Contains(colorInfo))
+                                {
+                                    repeatColors.Add(colorInfo);
+                                    uniqueColors.Remove(colorInfo);
+                                }
+                                else
+                                {
+                                    uniqueColors.Add(colorInfo);
+                                }
+                            }
+                        }
+                    }
+
+                    _uniqueColorInfos = uniqueColors.ToList();
+                    return _uniqueColorInfos;
+                }, cancellationToken);
+            }
+
+            return new List<ColorInfo>();
         }
 
         private BitmapImage BitmapToImage(Bitmap bitmap)

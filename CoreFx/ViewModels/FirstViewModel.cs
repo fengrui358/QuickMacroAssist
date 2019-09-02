@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 using FrHello.NetLib.Core.Mvx;
 using FrHello.NetLib.Core.Windows.Windows;
@@ -10,7 +13,11 @@ namespace CoreFx.ViewModels
 {
     public class FirstViewModel : BaseViewModel
     {
+        private CancellationTokenSource _lastOperateTokenSource;
+
         public ObservableCollection<ScreenInfo> Screens { get; set; }
+
+        public List<ColorInfo> ColorInfos { get; set; }
 
         public MvxCommand CaptureCommand { get; }
 
@@ -28,11 +35,24 @@ namespace CoreFx.ViewModels
             await Task.Run(RefreshScreens);
         }
 
-        private void CaptureCommandHandler()
+        private async void CaptureCommandHandler()
         {
             if (SelectedScreenInfo != null)
             {
-                SelectedScreenInfo.CaptureProcess();
+                try
+                {
+                    SelectedScreenInfo.CaptureProcess();
+
+                    _lastOperateTokenSource?.Cancel();
+                    _lastOperateTokenSource = new CancellationTokenSource();
+
+                    ColorInfos = new List<ColorInfo>();
+                    ColorInfos = await SelectedScreenInfo.ScanAllUniqueColors(_lastOperateTokenSource.Token);
+                }
+                catch (OperationCanceledException canceledException)
+                {
+                    Debug.WriteLine(canceledException);
+                }
             }
         }
 

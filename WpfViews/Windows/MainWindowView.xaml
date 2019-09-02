@@ -23,8 +23,8 @@
                         <RowDefinition Height="3" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-                    <TextBlock Grid.Row="0" Text="{Binding Name}" FontWeight="Bold" HorizontalAlignment="Center"/>
-                    <TextBlock Grid.Row="2" Text="{Binding SizeInfo}" HorizontalAlignment="Center"/>
+                    <TextBlock Grid.Row="0" Text="{Binding Name}" FontWeight="Bold" HorizontalAlignment="Center" />
+                    <TextBlock Grid.Row="2" Text="{Binding SizeInfo}" HorizontalAlignment="Center" />
                 </Grid>
             </Border>
         </DataTemplate>
@@ -32,7 +32,7 @@
     <Border Padding="10">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid Grid.Row="0">
@@ -41,8 +41,9 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <Label Grid.Column="0" Content="屏幕：" VerticalAlignment="Center"/>
-                <ListBox Grid.Column="1" ItemsSource="{Binding Screens}" VerticalAlignment="Center" ItemTemplate="{StaticResource ScreenInfoDataTemplate}"
+                <Label Grid.Column="0" Content="屏幕：" VerticalAlignment="Center" />
+                <ListBox Grid.Column="1" ItemsSource="{Binding Screens}" VerticalAlignment="Center"
+                         ItemTemplate="{StaticResource ScreenInfoDataTemplate}"
                          SelectedItem="{Binding SelectedScreenInfo}">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -50,20 +51,23 @@
                         </ItemsPanelTemplate>
                     </ListBox.ItemsPanel>
                 </ListBox>
-                <Button Grid.Column="2" Content="截屏" Command="{Binding CaptureCommand}" 
-                        IsEnabled="{Binding SelectedScreenInfo, Converter={x:Static uiConverters:SuperConverterProvider.SuperConverter}}"  Margin="5"/>
+                <Button Grid.Column="2" Content="截屏" Command="{Binding CaptureCommand}"
+                        IsEnabled="{Binding SelectedScreenInfo, Converter={x:Static uiConverters:SuperConverterProvider.SuperConverter}}"
+                        Margin="5" />
             </Grid>
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" MinWidth="165" />
                 </Grid.ColumnDefinitions>
-                <Image Grid.Column="0" Source="{Binding SelectedScreenInfo.Capture}" Margin="5"/>
-                <Border Grid.Column="1" BorderThickness="1" BorderBrush="{DynamicResource AccentColorBrush}" Padding="5">
+                <Image Grid.Column="0" Source="{Binding SelectedScreenInfo.Capture}" Margin="5" />
+                <Border Grid.Column="1" BorderThickness="1" BorderBrush="{DynamicResource AccentColorBrush}"
+                        Padding="5">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
                         <Grid Grid.Row="0">
                             <Grid.ColumnDefinitions>
@@ -72,6 +76,21 @@
                             </Grid.ColumnDefinitions>
                             <CheckBox Grid.Column="0" Content="局部查找" />
                         </Grid>
+                        <ListBox Grid.Row="1" ItemsSource="{Binding ColorInfos}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate DataType="modelsFx:ColorInfo">
+                                    <Grid Margin="3">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Rectangle Width="15" Height="15" Fill="{Binding SolidColorBrush}" />
+                                        <TextBlock Grid.Column="1" Text="{Binding}" Margin="3,0,0,0" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                        <TextBlock Grid.Row="2" Text="{Binding ColorInfos.Count, StringFormat=总数：{0}}" />
                     </Grid>
                 </Border>
             </Grid>
