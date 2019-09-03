@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using FrHello.NetLib.Core.Mvx;
 using FrHello.NetLib.Core.Windows.Windows;
 using ModelsFx;
@@ -32,9 +34,18 @@ namespace CoreFx.ViewModels
 
         public event EventHandler<List<ColorInfo>> ColorInfosChangedEvent;
 
+        public MvxCommand<ColorInfo> CopyCommand { get; }
+        public MvxCommand<ColorInfo> CopyAreaCommand { get; }
+        public MvxCommand<ColorInfo> CopyRowCommand { get; }
+        public MvxCommand<ColorInfo> CopyColumnCommand { get; }
+
         public FirstViewModel()
         {
             CaptureCommand = new MvxCommand(CaptureCommandHandler);
+            CopyCommand = new MvxCommand<ColorInfo>(CopyCommandHandler);
+            CopyAreaCommand = new MvxCommand<ColorInfo>(CopyAreaCommandHandler);
+            CopyRowCommand = new MvxCommand<ColorInfo>(CopyRowCommandHandler);
+            CopyColumnCommand = new MvxCommand<ColorInfo>(CopyColumnCommandHandler);
 
             Task.Run(async () => { await Initialize(); });
         }
@@ -49,6 +60,36 @@ namespace CoreFx.ViewModels
             CaptureCommandHandler(true);
         }
 
+        private void CopyCommandHandler(ColorInfo colorInfo)
+        {
+            var str =
+                $"await WindowsApi.ScreenApi.WaitColorAt({colorInfo.Point.X}, {colorInfo.Point.Y}, Color.FromArgb({colorInfo.Color.R}, {colorInfo.Color.G}, {colorInfo.Color.B}));";
+
+            Clipboard.SetDataObject(str);
+        }
+
+        private void CopyAreaCommandHandler(ColorInfo colorInfo)
+        {
+            var str =
+                $"await WindowsApi.ScreenApi.WaitScanColorLocation(Color.FromArgb({colorInfo.Color.R}, {colorInfo.Color.G}, {colorInfo.Color.B}), WindowsApi.ScreenApi.AllScreens[{SelectedScreenInfo.Index}], new Rectangle({colorInfo.Point.X - Buffer / 2}, {colorInfo.Point.Y - Buffer / 2}, {Buffer}, {Buffer}));";
+
+            Clipboard.SetDataObject(str);
+        }
+
+        private void CopyRowCommandHandler(ColorInfo colorInfo)
+        {
+            var str =
+                $"await WindowsApi.ScreenApi.WaitScanColorLocation(Color.FromArgb({colorInfo.Color.R}, {colorInfo.Color.G}, {colorInfo.Color.B}), WindowsApi.ScreenApi.AllScreens[{SelectedScreenInfo.Index}], WindowsApi.ScreenApi.AllScreens[{SelectedScreenInfo.Index}].GetScreenRow({colorInfo.Point.Y - Buffer / 2}, {Buffer}));";
+
+            Clipboard.SetDataObject(str);
+        }
+
+        private void CopyColumnCommandHandler(ColorInfo colorInfo)
+        {
+            var str =
+                $"await WindowsApi.ScreenApi.WaitScanColorLocation(Color.FromArgb({colorInfo.Color.R}, {colorInfo.Color.G}, {colorInfo.Color.B}), WindowsApi.ScreenApi.AllScreens[{SelectedScreenInfo.Index}], WindowsApi.ScreenApi.AllScreens[{SelectedScreenInfo.Index}].GetScreenColumn({colorInfo.Point.X - Buffer / 2}, {Buffer}));";
+        }
+
         private async void CaptureCommandHandler(bool notify)
         {
             if (SelectedScreenInfo != null)
@@ -61,7 +102,7 @@ namespace CoreFx.ViewModels
                     _lastOperateTokenSource = new CancellationTokenSource();
 
                     ColorInfos = new List<ColorInfo>();
-                    ColorInfos = await SelectedScreenInfo.ScanAllUniqueColors(_lastOperateTokenSource.Token);
+                    ColorInfos = (await SelectedScreenInfo.ScanAllUniqueColors(_lastOperateTokenSource.Token)).ToList();
                 }
                 catch (OperationCanceledException canceledException)
                 {

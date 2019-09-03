@@ -37,20 +37,17 @@ namespace WpfViews.Windows
         private void MainWindowView_OnLoaded(object sender, RoutedEventArgs e)
         {
             var viewModel = (FirstViewModel) DataContext;
-            viewModel.PropertyChanged += ViewModelOnPropertyChanged;
+            viewModel.ColorInfosChangedEvent += OnColorInfosChangedEvent;
         }
 
-        private void ViewModelOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void OnColorInfosChangedEvent(object sender, List<ColorInfo> e)
         {
-            if (e.PropertyName == nameof(FirstViewModel.ColorInfos))
+            UiDispatcherHelper.Invoke(() =>
             {
-                UiDispatcherHelper.Invoke(() =>
-                {
-                    _lastOperateTokenSource?.Cancel();
-                    _lastOperateTokenSource = new CancellationTokenSource();
-                    DrawingColors(((FirstViewModel)sender).ColorInfos, _lastOperateTokenSource.Token);
-                });
-            }
+                _lastOperateTokenSource?.Cancel();
+                _lastOperateTokenSource = new CancellationTokenSource();
+                DrawingColors(((FirstViewModel)sender).ColorInfos, _lastOperateTokenSource.Token);
+            });
         }
 
         private void DrawingColors(List<ColorInfo> colorInfos, CancellationToken cancellationToken = default)

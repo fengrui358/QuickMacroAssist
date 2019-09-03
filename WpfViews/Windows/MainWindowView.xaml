@@ -28,6 +28,22 @@
                 </Grid>
             </Border>
         </DataTemplate>
+
+        <ContextMenu x:Key="CopyContextMenu"
+                     DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+            <MenuItem Header="复制"
+                      Command="{Binding DataContext.CopyCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}" />
+            <MenuItem Header="复制区域"
+                      Command="{Binding DataContext.CopyAreaCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}"/>
+            <MenuItem Header="复制行" 
+                      Command="{Binding DataContext.CopyRowCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}"/>
+            <MenuItem Header="复制列" 
+                      Command="{Binding DataContext.CopyColumnCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}"/>
+        </ContextMenu>
+
+        <Style x:Key="CommandItemStyle" TargetType="ListBoxItem">
+            <Setter Property="ContextMenu" Value="{StaticResource CopyContextMenu}" />
+        </Style>
     </mah:MetroWindow.Resources>
     <Border Padding="10">
         <Grid>
@@ -92,17 +108,19 @@
                             <Slider Grid.Column="1" Minimum="10" Maximum="300" Value="{Binding Buffer}" Interval="1"
                                     IsEnabled="{Binding UseBuffer}" Margin="3,0" AutoToolTipPlacement="TopLeft" />
                         </Grid>
-                        <ListBox Grid.Row="2" ItemsSource="{Binding ColorInfos}">
+                        <ListBox Grid.Row="2" ItemsSource="{Binding ColorInfos}" ItemContainerStyle="{StaticResource CommandItemStyle}">
                             <ListBox.ItemTemplate>
                                 <DataTemplate DataType="modelsFx:ColorInfo">
-                                    <Grid Margin="3">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        <Rectangle Width="15" Height="15" Fill="{Binding SolidColorBrush}" />
-                                        <TextBlock Grid.Column="1" Text="{Binding}" Margin="3,0,0,0" />
-                                    </Grid>
+                                    <Border Padding="3" Background="Transparent">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <Rectangle Width="15" Height="15" Fill="{Binding SolidColorBrush}" />
+                                            <TextBlock Grid.Column="1" Text="{Binding}" Margin="3,0,0,0" />
+                                        </Grid>
+                                    </Border>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>

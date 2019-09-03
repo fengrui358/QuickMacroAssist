@@ -91,7 +91,7 @@ namespace ModelsFx
             Capture = BitmapToImage(_bitmap);
         }
 
-        public async Task<List<ColorInfo>> ScanAllUniqueColors(CancellationToken cancellationToken)
+        public async Task<IEnumerable<ColorInfo>> ScanAllUniqueColors(CancellationToken cancellationToken)
         {
             if (_bitmap != null)
             {
