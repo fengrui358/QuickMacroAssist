@@ -132,6 +132,7 @@
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
+                        <mah:ProgressRing Grid.Row="2" IsActive="{Binding IsBusy, Mode=OneWay}" />
                         <TextBlock Grid.Row="3" Text="{Binding ColorInfos.Count, StringFormat=总数：{0}}" />
                     </Grid>
                 </Border>

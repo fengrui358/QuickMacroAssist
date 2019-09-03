@@ -31,6 +31,8 @@ namespace CoreFx.ViewModels
 
         public bool ShowTaskBar { get; set; }
 
+        public bool IsBusy { get; set; }
+
         public event EventHandler<List<ColorInfo>> ColorInfosChangedEvent;
 
         public MvxCommand<ColorInfo> CopyCommand { get; }
@@ -97,6 +99,8 @@ namespace CoreFx.ViewModels
             {
                 try
                 {
+                    IsBusy = true;
+
                     SelectedScreenInfo.CaptureProcess(ShowTaskBar);
 
                     _lastOperateTokenSource?.Cancel();
@@ -108,6 +112,10 @@ namespace CoreFx.ViewModels
                 catch (OperationCanceledException canceledException)
                 {
                     Debug.WriteLine(canceledException);
+                }
+                finally
+                {
+                    IsBusy = false;
                 }
             }
 

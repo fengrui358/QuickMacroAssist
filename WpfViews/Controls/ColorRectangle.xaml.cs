@@ -35,6 +35,13 @@ namespace WpfViews.Controls
                 colorInfo.Color.G, colorInfo.Color.B));
         }
 
+        public void UpdateColorInfo(ColorInfo colorInfo)
+        {
+            _colorInfo = colorInfo;
+            Inner.Background = new SolidColorBrush(Color.FromArgb(colorInfo.Color.A, colorInfo.Color.R,
+                colorInfo.Color.G, colorInfo.Color.B));
+        }
+
         private void ColorRectangle_OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             
