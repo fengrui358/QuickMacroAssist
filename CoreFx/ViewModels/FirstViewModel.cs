@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FrHello.NetLib.Core.Mvx;
@@ -23,6 +24,14 @@ namespace CoreFx.ViewModels
 
         public ScreenInfo SelectedScreenInfo { get; set; }
 
+        public bool UseBuffer { get; set; }
+
+        public int Buffer { get; set; } = 10;
+
+        public bool ShowTaskBar { get; set; }
+
+        public event EventHandler<List<ColorInfo>> ColorInfosChangedEvent;
+
         public FirstViewModel()
         {
             CaptureCommand = new MvxCommand(CaptureCommandHandler);
@@ -35,13 +44,18 @@ namespace CoreFx.ViewModels
             await Task.Run(RefreshScreens);
         }
 
-        private async void CaptureCommandHandler()
+        private void CaptureCommandHandler()
+        {
+            CaptureCommandHandler(true);
+        }
+
+        private async void CaptureCommandHandler(bool notify)
         {
             if (SelectedScreenInfo != null)
             {
                 try
                 {
-                    SelectedScreenInfo.CaptureProcess();
+                    SelectedScreenInfo.CaptureProcess(ShowTaskBar);
 
                     _lastOperateTokenSource?.Cancel();
                     _lastOperateTokenSource = new CancellationTokenSource();
@@ -55,7 +69,12 @@ namespace CoreFx.ViewModels
                 }
             }
 
-            //await RaisePropertyChanged(nameof(SelectedScreenInfo));
+            if (notify)
+            {
+                await RaisePropertyChanged(nameof(SelectedScreenInfo));
+            }
+            
+            ColorInfosChangedEvent?.Invoke(this, ColorInfos.ToList());
         }
 
         private void RefreshScreens()
@@ -72,7 +91,12 @@ namespace CoreFx.ViewModels
 
         private void OnSelectedScreenInfoChanged()
         {
-            CaptureCommandHandler();
+            CaptureCommandHandler(false);
+        }
+
+        private void OnShowTaskBarChanged()
+        {
+            CaptureCommandHandler(true);
         }
     }
 }

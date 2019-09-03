@@ -61,7 +61,8 @@
                     <ColumnDefinition Width="Auto" MinWidth="165" />
                 </Grid.ColumnDefinitions>
                 <Grid Margin="5">
-                    <Image x:Name="ScreenImage" Grid.Column="0" Source="{Binding SelectedScreenInfo.Capture}" Margin="5" />
+                    <Image x:Name="ScreenImage" Grid.Column="0" Source="{Binding SelectedScreenInfo.Capture}"
+                           Margin="5" />
                     <Canvas x:Name="Mask" Background="Transparent" />
                 </Grid>
                 <Border Grid.Column="1" BorderThickness="1" BorderBrush="{DynamicResource AccentColorBrush}"
@@ -69,17 +70,29 @@
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
                         <Grid Grid.Row="0">
                             <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <CheckBox Grid.Column="0" Content="缓冲" IsChecked="{Binding UseBuffer}" />
+                            <CheckBox Grid.Column="1" Content="任务栏" IsChecked="{Binding ShowTaskBar}" />
+                        </Grid>
+                        <Grid Grid.Row="1" Margin="0,3">
+                            <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <CheckBox Grid.Column="0" Content="局部查找" />
+                            <mah:NumericUpDown Grid.Column="0" IsEnabled="{Binding UseBuffer}" Value="{Binding Buffer}"
+                                               Interval="1" Minimum="10" Maximum="300" />
+                            <Slider Grid.Column="1" Minimum="10" Maximum="300" Value="{Binding Buffer}" Interval="1"
+                                    IsEnabled="{Binding UseBuffer}" Margin="3,0" AutoToolTipPlacement="TopLeft" />
                         </Grid>
-                        <ListBox Grid.Row="1" ItemsSource="{Binding ColorInfos}">
+                        <ListBox Grid.Row="2" ItemsSource="{Binding ColorInfos}">
                             <ListBox.ItemTemplate>
                                 <DataTemplate DataType="modelsFx:ColorInfo">
                                     <Grid Margin="3">
@@ -93,7 +106,7 @@
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
-                        <TextBlock Grid.Row="2" Text="{Binding ColorInfos.Count, StringFormat=总数：{0}}" />
+                        <TextBlock Grid.Row="3" Text="{Binding ColorInfos.Count, StringFormat=总数：{0}}" />
                     </Grid>
                 </Border>
             </Grid>

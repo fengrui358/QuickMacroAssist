@@ -63,10 +63,17 @@ namespace ModelsFx
             _uniqueColorInfos.Clear();
         }
 
-        public void CaptureProcess()
+        public void CaptureProcess(bool showTaskBar)
         {
             Clear();
-            var screenPixel = new Bitmap(Screen.Bounds.Width, Screen.Bounds.Height, PixelFormat.Format32bppArgb);
+
+            var width = showTaskBar ? Screen.Bounds.Width : Screen.WorkingArea.Width;
+            var height = showTaskBar ? Screen.Bounds.Height : Screen.WorkingArea.Height;
+
+            var x = showTaskBar ? Screen.Bounds.X : Screen.WorkingArea.X;
+            var y = showTaskBar ? Screen.Bounds.Y : Screen.WorkingArea.Y;
+
+            var screenPixel = new Bitmap(width, height, PixelFormat.Format32bppArgb);
 
             using (var dest = Graphics.FromImage(screenPixel))
             {
@@ -74,8 +81,7 @@ namespace ModelsFx
                 {
                     var hSrcDc = src.GetHdc();
                     var hDc = dest.GetHdc();
-                    BitBlt(hDc, 0, 0, Screen.Bounds.Width, Screen.Bounds.Height, hSrcDc, Screen.Bounds.X,
-                        Screen.Bounds.Y, (int)CopyPixelOperation.SourceCopy);
+                    BitBlt(hDc, 0, 0, width, height, hSrcDc, x, y, (int)CopyPixelOperation.SourceCopy);
                     dest.ReleaseHdc();
                     src.ReleaseHdc();
                 }
@@ -98,8 +104,6 @@ namespace ModelsFx
                     {
                         for (var j = 0; j < _bitmap.Height; j++)
                         {
-                            cancellationToken.ThrowIfCancellationRequested();
-
                             var color = _bitmap.GetPixel(i, j);
                             var colorInfo = new ColorInfo(this, color, new Point(i, j));
                             if (!repeatColors.Contains(colorInfo))
@@ -114,6 +118,8 @@ namespace ModelsFx
                                     uniqueColors.Add(colorInfo);
                                 }
                             }
+
+                            cancellationToken.ThrowIfCancellationRequested();
                         }
                     }
 
