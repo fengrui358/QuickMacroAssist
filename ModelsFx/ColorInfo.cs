@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Drawing;
+using System.Windows;
 using System.Windows.Media;
 using Color = System.Drawing.Color;
+using Point = System.Drawing.Point;
 
 namespace ModelsFx
 {
@@ -16,6 +18,8 @@ namespace ModelsFx
         public SolidColorBrush SolidColorBrush => new SolidColorBrush(System.Windows.Media.Color.FromArgb(Color.A, Color.R, Color.G, Color.B));
 
         public string ColorHex => BitConverter.ToString(new[] {Color.R, Color.G, Color.B}).Replace("-", string.Empty);
+
+        public UIElement UiElement { get; set; }
 
         public ColorInfo(ScreenInfo screenInfo, Color color, Point point)
         {

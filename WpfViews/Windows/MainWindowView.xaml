@@ -32,13 +32,17 @@
         <ContextMenu x:Key="CopyContextMenu"
                      DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
             <MenuItem Header="复制"
-                      Command="{Binding DataContext.CopyCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}" />
+                      Command="{Binding DataContext.CopyCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                      CommandParameter="{Binding}" />
             <MenuItem Header="复制区域"
-                      Command="{Binding DataContext.CopyAreaCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}"/>
-            <MenuItem Header="复制行" 
-                      Command="{Binding DataContext.CopyRowCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}"/>
-            <MenuItem Header="复制列" 
-                      Command="{Binding DataContext.CopyColumnCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}"/>
+                      Command="{Binding DataContext.CopyAreaCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                      CommandParameter="{Binding}" />
+            <MenuItem Header="复制行"
+                      Command="{Binding DataContext.CopyRowCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                      CommandParameter="{Binding}" />
+            <MenuItem Header="复制列"
+                      Command="{Binding DataContext.CopyColumnCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                      CommandParameter="{Binding}" />
         </ContextMenu>
 
         <Style x:Key="CommandItemStyle" TargetType="ListBoxItem">
@@ -79,7 +83,10 @@
                 <Grid Margin="5">
                     <Image x:Name="ScreenImage" Grid.Column="0" Source="{Binding SelectedScreenInfo.Capture}"
                            Margin="5" />
-                    <Canvas x:Name="Mask" Background="Transparent" />
+                    <Canvas x:Name="Mask" Background="Transparent"
+                            Width="{Binding ElementName=ScreenImage, Path=ActualWidth, Mode=OneWay}"
+                            Height="{Binding ElementName=ScreenImage, Path=ActualHeight, Mode=OneWay}"
+                            PreviewMouseMove="Mask_OnPreviewMouseMove" SizeChanged="Mask_OnSizeChanged"/>
                 </Grid>
                 <Border Grid.Column="1" BorderThickness="1" BorderBrush="{DynamicResource AccentColorBrush}"
                         Padding="5">
@@ -108,7 +115,8 @@
                             <Slider Grid.Column="1" Minimum="10" Maximum="300" Value="{Binding Buffer}" Interval="1"
                                     IsEnabled="{Binding UseBuffer}" Margin="3,0" AutoToolTipPlacement="TopLeft" />
                         </Grid>
-                        <ListBox Grid.Row="2" ItemsSource="{Binding ColorInfos}" ItemContainerStyle="{StaticResource CommandItemStyle}">
+                        <ListBox Grid.Row="2" ItemsSource="{Binding ColorInfos}"
+                                 ItemContainerStyle="{StaticResource CommandItemStyle}">
                             <ListBox.ItemTemplate>
                                 <DataTemplate DataType="modelsFx:ColorInfo">
                                     <Border Padding="3" Background="Transparent">

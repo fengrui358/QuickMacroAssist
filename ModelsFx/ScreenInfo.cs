@@ -119,7 +119,10 @@ namespace ModelsFx
                                 }
                             }
 
-                            cancellationToken.ThrowIfCancellationRequested();
+                            if (cancellationToken.IsCancellationRequested)
+                            {
+                                return new List<ColorInfo>();
+                            }
                         }
                     }
 

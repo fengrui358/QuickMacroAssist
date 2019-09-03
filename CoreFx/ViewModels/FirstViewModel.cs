@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Drawing;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -88,6 +87,8 @@ namespace CoreFx.ViewModels
         {
             var str =
                 $"await WindowsApi.ScreenApi.WaitScanColorLocation(Color.FromArgb({colorInfo.Color.R}, {colorInfo.Color.G}, {colorInfo.Color.B}), WindowsApi.ScreenApi.AllScreens[{SelectedScreenInfo.Index}], WindowsApi.ScreenApi.AllScreens[{SelectedScreenInfo.Index}].GetScreenColumn({colorInfo.Point.X - Buffer / 2}, {Buffer}));";
+
+            Clipboard.SetDataObject(str);
         }
 
         private async void CaptureCommandHandler(bool notify)

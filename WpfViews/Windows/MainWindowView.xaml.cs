@@ -1,24 +1,17 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using CoreFx.ViewModels;
 using FrHello.NetLib.Core.Mvx;
 using ModelsFx;
 using WpfViews.Controls;
+using Point = System.Drawing.Point;
 
 namespace WpfViews.Windows
 {
@@ -27,43 +20,57 @@ namespace WpfViews.Windows
     /// </summary>
     public partial class MainWindowView
     {
+        /// <summary>
+        /// 用于复用的UI矩形
+        /// </summary>
+        private readonly ConcurrentQueue<ColorRectangle> _colorRectanglesCache = new ConcurrentQueue<ColorRectangle>();
+        private readonly ConcurrentDictionary<Point, ColorInfo> _uniqueColorInfos = new ConcurrentDictionary<Point, ColorInfo>();
+        private FirstViewModel _viewModel;
+
         private CancellationTokenSource _lastOperateTokenSource;
+
+        private readonly Timer _mouseMoveTimer;
 
         public MainWindowView()
         {
             InitializeComponent();
+
+            _mouseMoveTimer = new Timer(MouseMoveHandler);
         }
 
         private void MainWindowView_OnLoaded(object sender, RoutedEventArgs e)
         {
-            var viewModel = (FirstViewModel) DataContext;
-            viewModel.ColorInfosChangedEvent += OnColorInfosChangedEvent;
+            _viewModel = (FirstViewModel) DataContext;
+            _viewModel.ColorInfosChangedEvent += OnColorInfosChangedEvent;
         }
 
         private void OnColorInfosChangedEvent(object sender, List<ColorInfo> e)
         {
+            _lastOperateTokenSource?.Cancel();
+            _lastOperateTokenSource = new CancellationTokenSource();
+
             UiDispatcherHelper.Invoke(() =>
             {
-                _lastOperateTokenSource?.Cancel();
-                _lastOperateTokenSource = new CancellationTokenSource();
-                DrawingColors(((FirstViewModel)sender).ColorInfos, _lastOperateTokenSource.Token);
+                CacheColors(((FirstViewModel) sender).ColorInfos, _lastOperateTokenSource.Token);
             });
         }
 
-        private void DrawingColors(List<ColorInfo> colorInfos, CancellationToken cancellationToken = default)
+        private void CacheColors(List<ColorInfo> colorInfos, CancellationToken cancellationToken = default)
         {
             try
             {
-                Mask.Children.Clear();
+                RemoveAll();
 
                 if (colorInfos != null && colorInfos.Any())
                 {
-                    var x = ScreenImage.ActualWidth;
-                    var y = ScreenImage.ActualHeight;
-
                     foreach (var colorInfo in colorInfos)
                     {
-                        //var colorRectangle = new ColorRectangle(colorInfo, Mask);
+                        if (cancellationToken.IsCancellationRequested)
+                        {
+                            return;
+                        }
+
+                        _uniqueColorInfos.TryAdd(colorInfo.Point, colorInfo);
                     }
                 }
             }
@@ -71,6 +78,64 @@ namespace WpfViews.Windows
             {
                 Debug.WriteLine(e);
             }
+        }
+
+        private void Mask_OnPreviewMouseMove(object sender, MouseEventArgs e)
+        {
+            //调整计时器，准备重新计算，停留1S开始绘制
+            _mouseMoveTimer.Change(TimeSpan.FromSeconds(1), Timeout.InfiniteTimeSpan);
+        }
+
+        private void MouseMoveHandler(object obj)
+        {
+            
+        }
+
+        private (double, double) GetLocationInCanvas(Canvas canvas, ColorInfo colorInfo)
+        {
+            int screenWidth;
+            int screenHeight;
+
+            if (_viewModel.ShowTaskBar)
+            {
+                screenWidth = colorInfo.ScreenInfo.Screen.Bounds.Width;
+                screenHeight = colorInfo.ScreenInfo.Screen.Bounds.Height;
+            }
+            else
+            {
+                screenWidth = colorInfo.ScreenInfo.Screen.WorkingArea.Width;
+                screenHeight = colorInfo.ScreenInfo.Screen.WorkingArea.Height;
+            }
+
+            var left = (canvas.ActualWidth / screenWidth) * colorInfo.Point.X;
+            var right = (canvas.ActualHeight / screenHeight) * colorInfo.Point.Y;
+
+            return (left, right);
+        }
+
+        private void Mask_OnSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            
+        }
+
+        private void RemoveAll()
+        {
+            foreach (var uniqueColorInfo in _uniqueColorInfos)
+            {
+                uniqueColorInfo.Value.UiElement = null;
+            }
+
+            _uniqueColorInfos.Clear();
+
+            UiDispatcherHelper.Invoke(() =>
+            {
+                foreach (ColorRectangle maskChild in Mask.Children)
+                {
+                    _colorRectanglesCache.Enqueue(maskChild);
+                }
+
+                Mask.Children.Clear();
+            });
         }
     }
 }
