@@ -25,6 +25,8 @@ namespace CoreFx.ViewModels
 
         public ScreenInfo SelectedScreenInfo { get; set; }
 
+        public ColorInfo SelectedColorInfo { get; set; }
+
         public bool UseBuffer { get; set; }
 
         public int Buffer { get; set; } = 10;
@@ -32,6 +34,8 @@ namespace CoreFx.ViewModels
         public bool ShowTaskBar { get; set; }
 
         public bool IsBusy { get; set; }
+
+        public bool MouseEnter { get; set; }
 
         public event EventHandler<List<ColorInfo>> ColorInfosChangedEvent;
 

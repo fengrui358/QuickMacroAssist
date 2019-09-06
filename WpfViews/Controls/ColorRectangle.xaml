@@ -5,9 +5,50 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:WpfViews.Controls"
              mc:Ignorable="d"
-             d:DesignHeight="450" d:DesignWidth="800" MouseLeftButtonDown="ColorRectangle_OnMouseLeftButtonDown">
-    <Grid>
-        <Border x:Name="Outer" BorderThickness="1" />
-        <Border x:Name="Inner" Width="10" Height="10" />
+             d:DesignHeight="450" d:DesignWidth="800" MouseLeftButtonDown="ColorRectangle_OnMouseLeftButtonDown"
+             RenderTransformOrigin="0.5, 0.5" Background="Transparent" MouseEnter="ColorRectangle_OnMouseEnter" MouseLeave="ColorRectangle_OnMouseLeave"
+             ToolTip="{Binding}">
+    <UserControl.ContextMenu>
+        <ContextMenu>
+            <MenuItem Header="复制" Click="CopyBtn_OnClick"/>
+            <MenuItem Header="复制区域" Click="CopyArea_OnClick"/>
+            <MenuItem Header="复制行" Click="CopyRow_OnClick"/>
+            <MenuItem Header="复制列" Click="CopyColumn_OnClick"/>
+        </ContextMenu>
+    </UserControl.ContextMenu>
+    <UserControl.Resources>
+        <ContextMenu x:Key="CopyContextMenu" DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+            <MenuItem Header="复制" Click="CopyBtn_OnClick"/>
+            <MenuItem Header="复制区域"
+                      Command="{Binding DataContext.CopyAreaCommand, RelativeSource={RelativeSource AncestorType=Canvas}}"
+                      CommandParameter="{Binding}" />
+            <MenuItem Header="复制行"
+                      Command="{Binding DataContext.CopyRowCommand, RelativeSource={RelativeSource AncestorType=Canvas}}"
+                      CommandParameter="{Binding}" />
+            <MenuItem Header="复制列"
+                      Command="{Binding DataContext.CopyColumnCommand, RelativeSource={RelativeSource AncestorType=Canvas}}"
+                      CommandParameter="{Binding}" />
+        </ContextMenu>
+    </UserControl.Resources>
+    <UserControl.RenderTransform>
+        <ScaleTransform x:Name="ScaleTransform" ScaleX="1.0" ScaleY="1.0" />
+    </UserControl.RenderTransform>
+    <UserControl.Triggers>
+        <EventTrigger RoutedEvent="Control.MouseEnter">
+            <BeginStoryboard x:Name="ScaleStoryboard">
+                <Storyboard FillBehavior="HoldEnd" Duration="0:0:0.1">
+                    <ThicknessAnimation Storyboard.TargetName="Inner" Storyboard.TargetProperty="BorderThickness" From="0,0,0,0" To="5,5,5,5" />
+                    <DoubleAnimation Storyboard.TargetName="ScaleTransform" Storyboard.TargetProperty="ScaleX" From="1.0" To="12.0" />
+                    <DoubleAnimation Storyboard.TargetName="ScaleTransform" Storyboard.TargetProperty="ScaleY" From="1.0" To="12.0" />
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+        <EventTrigger RoutedEvent="Control.MouseLeave">
+            <StopStoryboard BeginStoryboardName="ScaleStoryboard">
+            </StopStoryboard>
+        </EventTrigger>
+    </UserControl.Triggers>
+    <Grid x:Name="Test" Background="Transparent">
+        <Border x:Name="Inner" Width="10" Height="10" BorderThickness="0" BorderBrush="Red" />
     </Grid>
 </UserControl>

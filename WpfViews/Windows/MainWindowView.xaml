@@ -83,58 +83,82 @@
                 <Grid Margin="5">
                     <Image x:Name="ScreenImage" Grid.Column="0" Source="{Binding SelectedScreenInfo.Capture}"
                            Margin="5" />
-                    <Canvas x:Name="Mask" Background="Transparent"
-                            Width="{Binding ElementName=ScreenImage, Path=ActualWidth, Mode=OneWay}"
-                            Height="{Binding ElementName=ScreenImage, Path=ActualHeight, Mode=OneWay}"
-                            PreviewMouseMove="Mask_OnPreviewMouseMove" SizeChanged="Mask_OnSizeChanged"/>
+                    <Grid Width="{Binding ElementName=ScreenImage, Path=ActualWidth, Mode=OneWay}"
+                          Height="{Binding ElementName=ScreenImage, Path=ActualHeight, Mode=OneWay}"
+                          SizeChanged="Mask_OnSizeChanged" Background="Transparent" MouseEnter="UIElement_OnMouseEnter"
+                          MouseLeave="UIElement_OnMouseLeave">
+                        <Grid>
+                            <Grid.Visibility>
+                                <MultiBinding
+                                    Converter="{x:Static uiConverters:SuperConverterProvider.SuperConverterForMulti}">
+                                    <Binding Path="MouseEnter" Mode="OneWay" />
+                                    <Binding ElementName="PixelTabItem" Path="IsSelected" Mode="OneWay" />
+                                </MultiBinding>
+                            </Grid.Visibility>
+                            <Canvas x:Name="MaskMouseBounds">
+                                <Rectangle x:Name="MaskMouseBoundsRect" StrokeThickness="1" Stroke="Red"
+                                           Fill="{DynamicResource AccentColorBrush}" Opacity="0.4" />
+                            </Canvas>
+                            <Canvas x:Name="Mask" Background="Transparent"
+                                    PreviewMouseMove="Mask_OnPreviewMouseMove" />
+                        </Grid>
+                    </Grid>
                 </Grid>
                 <Border Grid.Column="1" BorderThickness="1" BorderBrush="{DynamicResource AccentColorBrush}"
                         Padding="5">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-                        <Grid Grid.Row="0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <CheckBox Grid.Column="0" Content="缓冲" IsChecked="{Binding UseBuffer}" />
-                            <CheckBox Grid.Column="1" Content="任务栏" IsChecked="{Binding ShowTaskBar}" />
-                        </Grid>
-                        <Grid Grid.Row="1" Margin="0,3">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <mah:NumericUpDown Grid.Column="0" IsEnabled="{Binding UseBuffer}" Value="{Binding Buffer}"
-                                               Interval="1" Minimum="10" Maximum="300" />
-                            <Slider Grid.Column="1" Minimum="10" Maximum="300" Value="{Binding Buffer}" Interval="1"
-                                    IsEnabled="{Binding UseBuffer}" Margin="3,0" AutoToolTipPlacement="TopLeft" />
-                        </Grid>
-                        <ListBox Grid.Row="2" ItemsSource="{Binding ColorInfos}"
-                                 ItemContainerStyle="{StaticResource CommandItemStyle}">
-                            <ListBox.ItemTemplate>
-                                <DataTemplate DataType="modelsFx:ColorInfo">
-                                    <Border Padding="3" Background="Transparent">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto" />
-                                                <ColumnDefinition Width="*" />
-                                            </Grid.ColumnDefinitions>
-                                            <Rectangle Width="15" Height="15" Fill="{Binding SolidColorBrush}" />
-                                            <TextBlock Grid.Column="1" Text="{Binding}" Margin="3,0,0,0" />
-                                        </Grid>
-                                    </Border>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
-                        <mah:ProgressRing Grid.Row="2" IsActive="{Binding IsBusy, Mode=OneWay}" />
-                        <TextBlock Grid.Row="3" Text="{Binding ColorInfos.Count, StringFormat=总数：{0}}" />
-                    </Grid>
+                    <TabControl>
+                        <TabItem x:Name="PixelTabItem" Header="像素点">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Grid Grid.Row="0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <CheckBox Grid.Column="0" Content="缓冲" IsChecked="{Binding UseBuffer}" />
+                                    <CheckBox Grid.Column="1" Content="任务栏" IsChecked="{Binding ShowTaskBar}" />
+                                </Grid>
+                                <Grid Grid.Row="1" Margin="0,3">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <mah:NumericUpDown Grid.Column="0" IsEnabled="{Binding UseBuffer}"
+                                                       Value="{Binding Buffer}"
+                                                       Interval="1" Minimum="10" Maximum="300" />
+                                    <Slider Grid.Column="1" Minimum="10" Maximum="300" Value="{Binding Buffer}"
+                                            Interval="1"
+                                            IsEnabled="{Binding UseBuffer}" Margin="3,0" AutoToolTipPlacement="TopLeft" />
+                                </Grid>
+                                <ListBox x:Name="ColorInfosListBox" Grid.Row="2" ItemsSource="{Binding ColorInfos}"
+                                         SelectedItem="{Binding SelectedColorInfo}"
+                                         ItemContainerStyle="{StaticResource CommandItemStyle}">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate DataType="modelsFx:ColorInfo">
+                                            <Border Padding="3" Background="Transparent">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Rectangle Width="15" Height="15" Fill="{Binding SolidColorBrush}" />
+                                                    <TextBlock Grid.Column="1" Text="{Binding}" Margin="3,0,0,0" />
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                                <mah:ProgressRing Grid.Row="2" IsActive="{Binding IsBusy, Mode=OneWay}" />
+                                <TextBlock Grid.Row="3" Text="{Binding ColorInfos.Count, StringFormat=总数：{0}}" />
+                            </Grid>
+                        </TabItem>
+                        <TabItem Header="位图" />
+                    </TabControl>
                 </Border>
             </Grid>
         </Grid>
