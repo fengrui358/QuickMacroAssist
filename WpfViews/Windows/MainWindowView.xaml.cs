@@ -27,6 +27,8 @@ namespace WpfViews.Windows
         /// 用于复用的UI矩形
         /// </summary>
         private readonly ConcurrentQueue<ColorRectangle> _colorRectanglesCache = new ConcurrentQueue<ColorRectangle>();
+        private readonly ConcurrentDictionary<Point, ColorRectangle> _colorInfosInCanvas = new ConcurrentDictionary<Point, ColorRectangle>();
+
         private readonly ConcurrentDictionary<Point, ColorInfo> _uniqueColorInfos = new ConcurrentDictionary<Point, ColorInfo>();
         private FirstViewModel _viewModel;
 
@@ -153,27 +155,27 @@ namespace WpfViews.Windows
                     }
 
                     var tobeRemoves = new List<ColorRectangle>();
-                    await UiDispatcherHelper.InvokeAsync(() =>
+
+                    foreach (var colorInfosInCanva in _colorInfosInCanvas)
                     {
-                        foreach (ColorRectangle maskChild in Mask.Children)
+                        if (!CheckGoOn())
                         {
-                            if (!CheckGoOn())
-                            {
-                                return;
-                            }
-
-                            var colorInfo = (ColorInfo) maskChild.Tag;
-
-                            if (!contains.ContainsKey(colorInfo.Point))
-                            {
-                                tobeRemoves.Add(maskChild);
-                            }
-                            else
-                            {
-                                contains.Remove(colorInfo.Point);
-                            }
+                            return;
                         }
 
+                        var colorInfo = (ColorInfo) colorInfosInCanva.Value.Tag;
+                        if (!contains.ContainsKey(colorInfo.Point))
+                        {
+                            tobeRemoves.Add(colorInfosInCanva.Value);
+                        }
+                        else
+                        {
+                            contains.Remove(colorInfo.Point);
+                        }
+                    }
+
+                    await UiDispatcherHelper.InvokeAsync(() =>
+                    {
                         foreach (var tobeRemove in tobeRemoves)
                         {
                             if (!CheckGoOn())
@@ -183,6 +185,7 @@ namespace WpfViews.Windows
 
                             Mask.Children.Remove(tobeRemove);
                             _colorRectanglesCache.Enqueue(tobeRemove);
+                            //_colorInfosInCanvas.TryRemove(tobeRemove.Tag., out _);
                         }
 
                         //最多呈现10个元素

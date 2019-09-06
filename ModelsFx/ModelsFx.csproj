@@ -54,7 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FrHello.NetLib.Core.Windows">
-      <Version>1.0.13</Version>
+      <Version>1.0.16</Version>
     </PackageReference>
     <PackageReference Include="MvvmCross">
       <Version>6.3.1</Version>
