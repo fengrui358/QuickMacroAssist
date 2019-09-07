@@ -6,10 +6,12 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Forms;
 using FrHello.NetLib.Core.Mvx;
 using FrHello.NetLib.Core.Windows.Windows;
 using ModelsFx;
 using MvvmCross.Commands;
+using Clipboard = System.Windows.Clipboard;
 
 namespace CoreFx.ViewModels
 {
@@ -26,6 +28,8 @@ namespace CoreFx.ViewModels
         public ScreenInfo SelectedScreenInfo { get; set; }
 
         public ColorInfo SelectedColorInfo { get; set; }
+
+        public MvxCommand AddPictureFile { get; private set; }
 
         public bool UseBuffer { get; set; }
 
@@ -53,6 +57,7 @@ namespace CoreFx.ViewModels
             CopyAreaCommand = new MvxCommand<ColorInfo>(CopyAreaCommandHandler);
             CopyRowCommand = new MvxCommand<ColorInfo>(CopyRowCommandHandler);
             CopyColumnCommand = new MvxCommand<ColorInfo>(CopyColumnCommandHandler);
+            AddPictureFile = new MvxCommand(AddPictureFileHandler);
 
             Task.Run(async () => { await Initialize(); });
         }
@@ -143,6 +148,24 @@ namespace CoreFx.ViewModels
             }
 
             Screens = new ObservableCollection<ScreenInfo>(screens);
+        }
+
+        private void AddPictureFileHandler()
+        {
+            var dialog = new OpenFileDialog
+            {
+                Filter = "Bitmap (*.bmp)|*.bmp",
+                Multiselect = false
+            };
+
+            var result = dialog.ShowDialog();
+            if (result == DialogResult.OK)
+            {
+                if (dialog.FileNames.Any())
+                {
+                    //FilePath = dialog.FileNames.First();
+                }
+            }
         }
 
         private void OnSelectedScreenInfoChanged()
