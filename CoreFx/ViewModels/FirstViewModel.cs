@@ -37,6 +37,8 @@ namespace CoreFx.ViewModels
 
         public bool MouseEnter { get; set; }
 
+        public int CopyBitmapToClipboardIndex { get; set; } = 1;
+
         public event EventHandler<List<ColorInfo>> ColorInfosChangedEvent;
 
         public MvxCommand<ColorInfo> CopyCommand { get; }

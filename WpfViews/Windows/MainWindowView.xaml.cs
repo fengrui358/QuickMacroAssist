@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Windows;
@@ -334,6 +336,34 @@ namespace WpfViews.Windows
 
                     Mask.Children.Clear();
                 }
+            }
+        }
+
+        private void CopyOriginalPicture_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (_viewModel.SelectedScreenInfo != null)
+            {
+                var screenshotDir = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Screenshots"));
+
+                if (screenshotDir.Exists)
+                {
+                    screenshotDir.Delete(true);
+                    screenshotDir.Create();
+                }
+                else
+                {
+                    screenshotDir.Create();
+                }
+
+                var fileName = Path.Combine(screenshotDir.FullName,
+                    $"W{_viewModel.SelectedScreenInfo.Rectangle.Width}H{_viewModel.SelectedScreenInfo.Rectangle.Height}I{_viewModel.CopyBitmapToClipboardIndex++}.bmp");
+
+                using (var bitmap = _viewModel.SelectedScreenInfo.CopyBitmap())
+                {
+                    bitmap.Save(fileName);
+                }
+
+                Clipboard.SetFileDropList(new StringCollection { fileName });
             }
         }
     }

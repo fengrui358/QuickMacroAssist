@@ -13,7 +13,6 @@ namespace ModelsFx
 {
     public class ScreenInfo
     {
-        private Bitmap _bitmap;
         private List<ColorInfo> _uniqueColorInfos = new List<ColorInfo>();
 
         [DllImport("gdi32.dll", CharSet = CharSet.Auto, SetLastError = true, ExactSpelling = true)]
@@ -54,11 +53,13 @@ namespace ModelsFx
             Rectangle = screen.Bounds;
         }
 
+        private Bitmap Bitmap { get; set; }
+
         public BitmapImage Capture { get; private set; }
 
         private void Clear()
         {
-            _bitmap = null;
+            Bitmap = null;
             Capture = null;
             _uniqueColorInfos.Clear();
         }
@@ -87,24 +88,24 @@ namespace ModelsFx
                 }
             }
 
-            _bitmap = screenPixel;
-            Capture = BitmapToImage(_bitmap);
+            Bitmap = screenPixel;
+            Capture = BitmapToImage(Bitmap);
         }
 
         public async Task<IEnumerable<ColorInfo>> ScanAllUniqueColors(CancellationToken cancellationToken)
         {
-            if (_bitmap != null)
+            if (Bitmap != null)
             {
                 var uniqueColors = new HashSet<ColorInfo>();
                 var repeatColors = new HashSet<ColorInfo>();
 
                 return await Task.Run(() =>
                 {
-                    for (var i = 0; i < _bitmap.Width; i++)
+                    for (var i = 0; i < Bitmap.Width; i++)
                     {
-                        for (var j = 0; j < _bitmap.Height; j++)
+                        for (var j = 0; j < Bitmap.Height; j++)
                         {
-                            var color = _bitmap.GetPixel(i, j);
+                            var color = Bitmap.GetPixel(i, j);
                             var colorInfo = new ColorInfo(this, color, new Point(i, j));
                             if (!repeatColors.Contains(colorInfo))
                             {
@@ -149,6 +150,11 @@ namespace ModelsFx
             }
 
             return bitmapImage;
+        }
+
+        public Bitmap CopyBitmap()
+        {
+            return Bitmap.Clone(new Rectangle(new Point(0, 0), Bitmap.Size), PixelFormat.Format32bppArgb);
         }
     }
 }

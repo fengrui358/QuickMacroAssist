@@ -82,10 +82,10 @@
                 </Grid.ColumnDefinitions>
                 <Grid Margin="5">
                     <Image x:Name="ScreenImage" Grid.Column="0" Source="{Binding SelectedScreenInfo.Capture}"
-                           Margin="5" />
+                           Margin="5" SizeChanged="Mask_OnSizeChanged" />
                     <Grid Width="{Binding ElementName=ScreenImage, Path=ActualWidth, Mode=OneWay}"
                           Height="{Binding ElementName=ScreenImage, Path=ActualHeight, Mode=OneWay}"
-                          SizeChanged="Mask_OnSizeChanged" Background="Transparent" MouseEnter="UIElement_OnMouseEnter"
+                          Background="Transparent" MouseEnter="UIElement_OnMouseEnter"
                           MouseLeave="UIElement_OnMouseLeave">
                         <Grid>
                             <Grid.Visibility>
@@ -102,6 +102,17 @@
                             <Canvas x:Name="Mask" Background="Transparent"
                                     PreviewMouseMove="Mask_OnPreviewMouseMove" />
                         </Grid>
+                    </Grid>
+                    <Grid Width="{Binding ElementName=ScreenImage, Path=ActualWidth, Mode=OneWay}"
+                          Height="{Binding ElementName=ScreenImage, Path=ActualHeight, Mode=OneWay}"
+                          Visibility="{Binding ElementName=BitMapItem, Path=IsSelected, Mode=OneWay, Converter={x:Static uiConverters:SuperConverterProvider.SuperConverter}}">
+                        <Canvas x:Name="Sketchpad" Background="Transparent">
+                            <Canvas.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="复制大图" Click="CopyOriginalPicture_OnClick" IsEnabled="{Binding SelectedScreenInfo, Converter={x:Static uiConverters:SuperConverterProvider.SuperConverter}}"/>
+                                </ContextMenu>
+                            </Canvas.ContextMenu>
+                        </Canvas>
                     </Grid>
                 </Grid>
                 <Border Grid.Column="1" BorderThickness="1" BorderBrush="{DynamicResource AccentColorBrush}"
@@ -157,7 +168,14 @@
                                 <TextBlock Grid.Row="3" Text="{Binding ColorInfos.Count, StringFormat=总数：{0}}" />
                             </Grid>
                         </TabItem>
-                        <TabItem Header="位图" />
+                        <TabItem x:Name="BitMapItem" Header="位图">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                            </Grid>
+                        </TabItem>
                     </TabControl>
                 </Border>
             </Grid>
