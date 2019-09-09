@@ -71,7 +71,7 @@
                         </ItemsPanelTemplate>
                     </ListBox.ItemsPanel>
                 </ListBox>
-                <Button Grid.Column="2" Content="截屏" Command="{Binding CaptureCommand}"
+                <Button Grid.Column="2" Content="截屏（F12）" Command="{Binding CaptureCommand}"
                         IsEnabled="{Binding SelectedScreenInfo, Converter={x:Static uiConverters:SuperConverterProvider.SuperConverter}}"
                         Margin="5" />
             </Grid>
