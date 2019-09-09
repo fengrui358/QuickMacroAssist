@@ -70,6 +70,8 @@ namespace ModelsFx
         {
             try
             {
+                WindowsApi.ScreenApi.BitmapMatchOption = BitmapMatchOptions.SiftMatch;
+
                 var x = FindPicFromImage(srcBitmap, Bitmap);
 
                 return await WindowsApi.ScreenApi.ScanBitmapLocation(Bitmap, srcBitmap,
