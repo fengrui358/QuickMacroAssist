@@ -78,7 +78,7 @@
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" MinWidth="165" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Grid Margin="5">
                     <Image x:Name="ScreenImage" Grid.Column="0" Source="{Binding SelectedScreenInfo.Capture}"
@@ -173,12 +173,32 @@
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
                                 </Grid.RowDefinitions>
                                 <StackPanel Grid.Row="0" Orientation="Horizontal">
                                     <ToggleButton Content="画图" Margin="3" />
                                     <Button Content="添加" Margin="3" Command="{Binding AddPictureFile}"/>
                                     <Button Content="设置" Margin="3" />
                                 </StackPanel>
+                                <ListBox x:Name="BitMapsListBox" Grid.Row="1" ItemsSource="{Binding BitmapInfos}"
+                                         SelectedItem="{Binding SelectedBitmapInfo}" 
+                                         ItemContainerStyle="{StaticResource CommandItemStyle}">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate DataType="modelsFx:TargetBitmapInfo">
+                                            <Border Padding="3" Background="Transparent">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Image Grid.Column="0" Width="100" Height="70" Source="{Binding BitmapImage}" />
+                                                    <TextBlock Grid.Column="1" Text="{Binding Name}" MaxWidth="130" VerticalAlignment="Center" TextWrapping="Wrap" Margin="3,0,0,0" />
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                                <TextBlock Grid.Row="2" Text="{Binding BitMapsListBox.Count, StringFormat=总数：{0}}" />
                             </Grid>
                         </TabItem>
                     </TabControl>

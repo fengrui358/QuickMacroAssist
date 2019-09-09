@@ -5,7 +5,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Forms;
 using FrHello.NetLib.Core.Mvx;
 using FrHello.NetLib.Core.Windows.Windows;
@@ -18,10 +17,13 @@ namespace CoreFx.ViewModels
     public class FirstViewModel : BaseViewModel
     {
         private CancellationTokenSource _lastOperateTokenSource;
+        private CancellationTokenSource _lastMatchBitmap;
 
         public ObservableCollection<ScreenInfo> Screens { get; set; }
 
         public List<ColorInfo> ColorInfos { get; set; }
+
+        public ObservableCollection<TargetBitmapInfo> BitmapInfos { get; set; } = new ObservableCollection<TargetBitmapInfo>();
 
         public MvxCommand CaptureCommand { get; }
 
@@ -29,7 +31,9 @@ namespace CoreFx.ViewModels
 
         public ColorInfo SelectedColorInfo { get; set; }
 
-        public MvxCommand AddPictureFile { get; private set; }
+        public TargetBitmapInfo SelectedBitmapInfo { get; set; }
+
+        public MvxCommand AddPictureFile { get; }
 
         public bool UseBuffer { get; set; }
 
@@ -163,7 +167,10 @@ namespace CoreFx.ViewModels
             {
                 if (dialog.FileNames.Any())
                 {
-                    //FilePath = dialog.FileNames.First();
+                    var targetBitmap = new TargetBitmapInfo(dialog.FileName);
+                    targetBitmap.Init();
+
+                    BitmapInfos.Add(targetBitmap);
                 }
             }
         }
@@ -171,6 +178,22 @@ namespace CoreFx.ViewModels
         private void OnSelectedScreenInfoChanged()
         {
             CaptureCommandHandler(false);
+            OnSelectedBitmapInfoChanged();
+        }
+
+        private async void OnSelectedBitmapInfoChanged()
+        {
+            if (SelectedScreenInfo != null)
+            {
+                _lastMatchBitmap?.Cancel();
+                _lastMatchBitmap = new CancellationTokenSource();
+
+                if (SelectedBitmapInfo != null)
+                {
+                    var rectangle =
+                        await SelectedBitmapInfo?.Match(SelectedScreenInfo.CopyBitmap(), _lastMatchBitmap.Token);
+                }
+            }
         }
 
         private void OnShowTaskBarChanged()

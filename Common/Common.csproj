@@ -1,8 +1,12 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FrHello.NetLib.Core" Version="1.0.27" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\DataBase\DataBase.csproj" />

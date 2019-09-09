@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Media.Imaging;
+using ModelsFx.Help;
 
 namespace ModelsFx
 {
@@ -89,7 +90,7 @@ namespace ModelsFx
             }
 
             Bitmap = screenPixel;
-            Capture = BitmapToImage(Bitmap);
+            Capture = BitmapHelper.BitmapToImage(CopyBitmap());
         }
 
         public async Task<IEnumerable<ColorInfo>> ScanAllUniqueColors(CancellationToken cancellationToken)
@@ -99,13 +100,15 @@ namespace ModelsFx
                 var uniqueColors = new HashSet<ColorInfo>();
                 var repeatColors = new HashSet<ColorInfo>();
 
+                var bitmap = CopyBitmap();
+
                 return await Task.Run(() =>
                 {
-                    for (var i = 0; i < Bitmap.Width; i++)
+                    for (var i = 0; i < bitmap.Width; i++)
                     {
-                        for (var j = 0; j < Bitmap.Height; j++)
+                        for (var j = 0; j < bitmap.Height; j++)
                         {
-                            var color = Bitmap.GetPixel(i, j);
+                            var color = bitmap.GetPixel(i, j);
                             var colorInfo = new ColorInfo(this, color, new Point(i, j));
                             if (!repeatColors.Contains(colorInfo))
                             {
@@ -133,23 +136,6 @@ namespace ModelsFx
             }
 
             return new List<ColorInfo>();
-        }
-
-        private BitmapImage BitmapToImage(Bitmap bitmap)
-        {
-            var bitmapImage = new BitmapImage();
-            using (var ms = new System.IO.MemoryStream())
-            {
-                bitmap.Save(ms, ImageFormat.Bmp);
-
-                bitmapImage.BeginInit();
-                bitmapImage.StreamSource = ms;
-                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-                bitmapImage.EndInit();
-                bitmapImage.Freeze();
-            }
-
-            return bitmapImage;
         }
 
         public Bitmap CopyBitmap()
