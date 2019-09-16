@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Windows.Media.Imaging;
 
 namespace ModelsFx.Help
@@ -9,7 +10,8 @@ namespace ModelsFx.Help
         public static BitmapImage BitmapToImage(Bitmap bitmap)
         {
             var bitmapImage = new BitmapImage();
-            using (var ms = new System.IO.MemoryStream())
+            using (var ms = new MemoryStream())
+            using (bitmap)
             {
                 bitmap.Save(ms, ImageFormat.Png);
 

@@ -11,6 +11,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using CoreFx.ViewModels;
 using FrHello.NetLib.Core.Mvx;
 using ModelsFx;
@@ -78,6 +79,11 @@ namespace WpfViews.Windows
 
                 _canvasScreenWidthRatio = (float) Mask.ActualWidth / screenSize.Width;
                 _canvasScreenHeightRatio = (float) Mask.ActualHeight / screenSize.Height;
+            }
+
+            if (e.PropertyName == nameof(FirstViewModel.SelectedBitmapRectangle))
+            {
+                OnSelectedBitmapRectangleChanged();
             }
         }
 
@@ -273,6 +279,8 @@ namespace WpfViews.Windows
 
             _canvasScreenWidthRatio = (float) ScreenImage.ActualWidth / screenSize.Width;
             _canvasScreenHeightRatio = (float) ScreenImage.ActualHeight / screenSize.Height;
+
+            OnSelectedBitmapRectangleChanged();
         }
 
         private void RemoveAll()
@@ -365,6 +373,33 @@ namespace WpfViews.Windows
 
                 Clipboard.SetFileDropList(new StringCollection { fileName });
             }
+        }
+
+        private void OnSelectedBitmapRectangleChanged()
+        {
+            var rectangle = _viewModel.SelectedBitmapRectangle;
+
+            UiDispatcherHelper.Invoke(() =>
+            {
+                Sketchpad.Children.Clear();
+
+                if (rectangle != null)
+                {
+                    var uiRectangle = new System.Windows.Shapes.Rectangle
+                    {
+                        Width = rectangle.Value.Width * _canvasScreenWidthRatio,
+                        Height = rectangle.Value.Height * _canvasScreenHeightRatio,
+                        Fill = new SolidColorBrush(Colors.Blue),
+                        StrokeThickness = 2,
+                        Stroke = new SolidColorBrush(Colors.Black),
+                        Opacity = 0.3
+                    };
+
+                    Canvas.SetLeft(uiRectangle, rectangle.Value.X * _canvasScreenWidthRatio);
+                    Canvas.SetTop(uiRectangle, rectangle.Value.Y * _canvasScreenHeightRatio);
+                    Sketchpad.Children.Add(uiRectangle);
+                }
+            });
         }
     }
 }

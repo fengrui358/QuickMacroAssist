@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -33,6 +34,8 @@ namespace CoreFx.ViewModels
 
         public TargetBitmapInfo SelectedBitmapInfo { get; set; }
 
+        public Rectangle? SelectedBitmapRectangle { get; set; }
+
         public MvxCommand AddPictureFile { get; }
 
         public bool UseBuffer { get; set; }
@@ -56,6 +59,8 @@ namespace CoreFx.ViewModels
 
         public FirstViewModel()
         {
+            WindowsApi.ReceiveApiOperateLogEvent += (sender, s) => { Debug.WriteLine(s); };
+
             CaptureCommand = new MvxCommand(CaptureCommandHandler);
             CopyCommand = new MvxCommand<ColorInfo>(CopyCommandHandler);
             CopyAreaCommand = new MvxCommand<ColorInfo>(CopyAreaCommandHandler);
@@ -190,8 +195,13 @@ namespace CoreFx.ViewModels
 
                 if (SelectedBitmapInfo != null)
                 {
-                    var rectangle =
-                        await SelectedBitmapInfo?.Match(SelectedScreenInfo.CopyBitmap(), _lastMatchBitmap.Token);
+                    using (var bitmap = SelectedScreenInfo.CopyBitmap())
+                    {
+                        var rectangle =
+                            await SelectedBitmapInfo?.Match(bitmap, _lastMatchBitmap.Token);
+
+                        SelectedBitmapRectangle = rectangle;
+                    }
                 }
             }
         }

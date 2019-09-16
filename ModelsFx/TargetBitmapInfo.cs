@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -8,8 +9,6 @@ using System.Windows.Media.Imaging;
 using FrHello.NetLib.Core.Windows.Windows;
 using ModelsFx.Help;
 using NLog;
-using OpenCvSharp;
-using OpenCvSharp.Extensions;
 
 namespace ModelsFx
 {
@@ -52,8 +51,8 @@ namespace ModelsFx
             {
                 try
                 {
-                    Bitmap = new Bitmap(_filePath, true);
-                    BitmapImage = BitmapHelper.BitmapToImage(Bitmap);
+                    Bitmap = new Bitmap(_filePath);
+                    BitmapImage = BitmapHelper.BitmapToImage(CopyBitmap());
 
                     return true;
                 }
@@ -70,10 +69,6 @@ namespace ModelsFx
         {
             try
             {
-                WindowsApi.ScreenApi.BitmapMatchOption = BitmapMatchOptions.SiftMatch;
-
-                var x = FindPicFromImage(srcBitmap, Bitmap);
-
                 return await WindowsApi.ScreenApi.ScanBitmapLocation(Bitmap, srcBitmap,
                     cancellationToken: cancellationToken);
             }
@@ -85,39 +80,9 @@ namespace ModelsFx
             return null;
         }
 
-        public static System.Drawing.Point FindPicFromImage(Bitmap imgSrc, Bitmap imgSub, double threshold = 0.9, TemplateMatchModes templateMatch = TemplateMatchModes.CCoeffNormed)
+        public Bitmap CopyBitmap()
         {
-            OpenCvSharp.Mat srcMat = null;
-            OpenCvSharp.Mat dstMat = null;
-            OpenCvSharp.OutputArray outArray = null;
-            try
-            {
-                srcMat = imgSrc.ToMat();
-                dstMat = imgSub.ToMat();
-                outArray = OpenCvSharp.OutputArray.Create(srcMat);
-
-                OpenCvSharp.Cv2.MatchTemplate(srcMat, dstMat, outArray, templateMatch);
-                double minValue, maxValue;
-                OpenCvSharp.Point location, point;
-                OpenCvSharp.Cv2.MinMaxLoc(OpenCvSharp.InputArray.Create(outArray.GetMat()), out minValue, out maxValue, out location, out point);
-                Console.WriteLine(maxValue);
-                if (maxValue >= threshold)
-                    return new System.Drawing.Point(point.X, point.Y);
-                return System.Drawing.Point.Empty;
-            }
-            catch (Exception ex)
-            {
-                return System.Drawing.Point.Empty;
-            }
-            finally
-            {
-                if (srcMat != null)
-                    srcMat.Dispose();
-                if (dstMat != null)
-                    dstMat.Dispose();
-                if (outArray != null)
-                    outArray.Dispose();
-            }
+            return Bitmap.Clone(new Rectangle(0, 0, Bitmap.Width, Bitmap.Height), Bitmap.PixelFormat);
         }
     }
 }

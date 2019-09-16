@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -140,7 +141,7 @@ namespace ModelsFx
 
         public Bitmap CopyBitmap()
         {
-            return Bitmap.Clone(new Rectangle(new Point(0, 0), Bitmap.Size), PixelFormat.Format32bppArgb);
+            return Bitmap.Clone(new Rectangle(0, 0, Bitmap.Width, Bitmap.Height), Bitmap.PixelFormat);
         }
     }
 }

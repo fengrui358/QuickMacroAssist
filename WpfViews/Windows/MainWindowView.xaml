@@ -178,9 +178,9 @@
                                 <StackPanel Grid.Row="0" Orientation="Horizontal">
                                     <ToggleButton Content="画图" Margin="3" />
                                     <Button Content="添加" Margin="3" Command="{Binding AddPictureFile}"/>
-                                    <Button Content="设置" Margin="3" />
+                                    <!--<Button Content="设置" Margin="3" />-->
                                 </StackPanel>
-                                <ListBox x:Name="BitMapsListBox" Grid.Row="1" ItemsSource="{Binding BitmapInfos}"
+                                <ListBox Grid.Row="1" ItemsSource="{Binding BitmapInfos}"
                                          SelectedItem="{Binding SelectedBitmapInfo}" 
                                          ItemContainerStyle="{StaticResource CommandItemStyle}">
                                     <ListBox.ItemTemplate>
@@ -198,7 +198,7 @@
                                         </DataTemplate>
                                     </ListBox.ItemTemplate>
                                 </ListBox>
-                                <TextBlock Grid.Row="2" Text="{Binding BitMapsListBox.Count, StringFormat=总数：{0}}" />
+                                <TextBlock Grid.Row="2" Text="{Binding BitmapInfos.Count, StringFormat=总数：{0}}" />
                             </Grid>
                         </TabItem>
                     </TabControl>
