@@ -51,6 +51,7 @@ namespace ModelsFx.Help
 
         private void DisabledShow(object state)
         {
+            _prompt = string.Empty;
             Show = false;
         }
 
