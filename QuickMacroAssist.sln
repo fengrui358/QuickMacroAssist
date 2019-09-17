@@ -17,8 +17,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoreFx", "CoreFx\CoreFx.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModelsFx", "ModelsFx\ModelsFx.csproj", "{20938AA8-67D2-4D1A-8DA5-40D1BE1F09E2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetLib.Core.Windows", "C:\WorkSpace\NetLibCore\NetLib.Core.Windows\NetLib.Core.Windows.csproj", "{371A8550-5735-4525-AE71-6F9E828F37BD}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,10 +51,6 @@ Global
 		{20938AA8-67D2-4D1A-8DA5-40D1BE1F09E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{20938AA8-67D2-4D1A-8DA5-40D1BE1F09E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{20938AA8-67D2-4D1A-8DA5-40D1BE1F09E2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{371A8550-5735-4525-AE71-6F9E828F37BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{371A8550-5735-4525-AE71-6F9E828F37BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{371A8550-5735-4525-AE71-6F9E828F37BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{371A8550-5735-4525-AE71-6F9E828F37BD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

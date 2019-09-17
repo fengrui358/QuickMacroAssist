@@ -421,6 +421,16 @@ namespace WpfViews.Windows
                                 {
                                     Header = "复制小图", Command = _viewModel.CopyTargetBitmapCommand,
                                     CommandParameter = _viewModel.SelectedBitmapInfo
+                                },
+                                new MenuItem
+                                {
+                                    Header = "复制代码", Command = _viewModel.CopyCodeCommand,
+                                    CommandParameter = _viewModel.SelectedBitmapInfo
+                                },
+                                new MenuItem
+                                {
+                                    Header = "删除", Command = _viewModel.DeleteTargetBitmapCommand,
+                                    CommandParameter = _viewModel.SelectedBitmapInfo
                                 }
                             }
                         }
