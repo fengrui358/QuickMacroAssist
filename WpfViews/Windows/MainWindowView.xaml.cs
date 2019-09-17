@@ -385,11 +385,13 @@ namespace WpfViews.Windows
 
                 if (rectangle != null)
                 {
+                    var solidColorBrush = (SolidColorBrush) Application.Current.TryFindResource("AccentColorBrush");
+
                     var uiRectangle = new System.Windows.Shapes.Rectangle
                     {
                         Width = rectangle.Value.Width * _canvasScreenWidthRatio,
                         Height = rectangle.Value.Height * _canvasScreenHeightRatio,
-                        Fill = new SolidColorBrush(Colors.Blue),
+                        Fill = solidColorBrush,
                         StrokeThickness = 2,
                         Stroke = new SolidColorBrush(Colors.Black),
                         Opacity = 0.3

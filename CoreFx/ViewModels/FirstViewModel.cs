@@ -203,6 +203,10 @@ namespace CoreFx.ViewModels
                         SelectedBitmapRectangle = rectangle;
                     }
                 }
+                else
+                {
+                    SelectedBitmapRectangle = null;
+                }
             }
         }
 
