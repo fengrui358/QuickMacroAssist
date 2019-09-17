@@ -56,6 +56,12 @@
             <MenuItem Header="复制小图"
                       Command="{Binding DataContext.CopyTargetBitmapCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
                       CommandParameter="{Binding}" />
+            <MenuItem Header="复制代码"
+                      Command="{Binding DataContext.CopyTargetBitmapCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                      CommandParameter="{Binding}" />
+            <MenuItem Header="删除"
+                      Command="{Binding DataContext.DeleteTargetBitmapCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                      CommandParameter="{Binding}" />
         </ContextMenu>
 
         <Style x:Key="BitmapCommandItemStyle" TargetType="ListBoxItem">
@@ -120,7 +126,7 @@
                         <Grid Width="{Binding ElementName=ScreenImage, Path=ActualWidth, Mode=OneWay}"
                               Height="{Binding ElementName=ScreenImage, Path=ActualHeight, Mode=OneWay}"
                               Visibility="{Binding ElementName=BitMapItem, Path=IsSelected, Mode=OneWay, Converter={x:Static uiConverters:SuperConverterProvider.SuperConverter}}">
-                            <Canvas x:Name="Sketchpad" Background="Transparent">
+                            <Canvas x:Name="Sketchpad" Background="Transparent" MouseMove="Sketchpad_OnMouseMove" MouseLeftButtonDown="Sketchpad_OnMouseLeftButtonDown">
                                 <Canvas.ContextMenu>
                                     <ContextMenu>
                                         <MenuItem Header="复制大图" Click="CopyOriginalPicture_OnClick"
@@ -185,7 +191,7 @@
                                     <TextBlock Grid.Row="3" Text="{Binding ColorInfos.Count, StringFormat=总数：{0}}" />
                                 </Grid>
                             </TabItem>
-                            <TabItem x:Name="BitMapItem" Header="位图">
+                            <TabItem x:Name="BitMapItem" Header="位图" IsSelected="{Binding BitMapTabItemIsSelected}">
                                 <Grid>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto" />
@@ -193,7 +199,7 @@
                                         <RowDefinition Height="Auto" />
                                     </Grid.RowDefinitions>
                                     <StackPanel Grid.Row="0" Orientation="Horizontal">
-                                        <ToggleButton Content="画图" Margin="3" />
+                                        <ToggleButton Content="画图" Margin="3" IsChecked="{Binding StartPaint}" Checked="StartPaintButton_OnChecked" Unchecked="StartButton_OnUnchecked"/>
                                         <Button Content="添加" Margin="3" Command="{Binding AddPictureFile}" />
                                         <!--<Button Content="设置" Margin="3" />-->
                                     </StackPanel>

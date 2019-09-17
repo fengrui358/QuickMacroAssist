@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -27,6 +28,9 @@ namespace WpfViews.Windows
     /// </summary>
     public partial class MainWindowView
     {
+        private System.Windows.Point? _startPaintPoint;
+        private readonly System.Windows.Shapes.Rectangle _paintRectangle;
+
         /// <summary>
         /// 用于复用的UI矩形
         /// </summary>
@@ -50,6 +54,17 @@ namespace WpfViews.Windows
 
             _mouseMoveTimer = new Timer(MouseMoveHandler);
             ColorRectangle.ColorInfoSelected += ColorRectangleOnColorInfoSelected;
+
+            _paintRectangle = new System.Windows.Shapes.Rectangle
+            {
+                Width = 4,
+                Height = 4,
+                Stroke = new SolidColorBrush(Colors.Black),
+                StrokeThickness = 2,
+                StrokeDashOffset = 0.2,
+                Fill = (SolidColorBrush) Application.Current.TryFindResource("AccentColorBrush"),
+                Opacity = 0.8
+            };
         }
 
         private void ColorRectangleOnColorInfoSelected(object sender, ColorInfo e)
@@ -281,6 +296,8 @@ namespace WpfViews.Windows
             _canvasScreenWidthRatio = (float) ScreenImage.ActualWidth / screenSize.Width;
             _canvasScreenHeightRatio = (float) ScreenImage.ActualHeight / screenSize.Height;
 
+            _viewModel.StartPaint = false;
+
             OnSelectedBitmapRectangleChanged();
         }
 
@@ -352,7 +369,8 @@ namespace WpfViews.Windows
         {
             if (_viewModel.SelectedScreenInfo != null)
             {
-                var screenshotDir = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Screenshots"));
+                var screenshotDir =
+                    new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Screenshots"));
 
                 if (screenshotDir.Exists)
                 {
@@ -372,7 +390,7 @@ namespace WpfViews.Windows
                     bitmap.Save(fileName);
                 }
 
-                Clipboard.SetFileDropList(new StringCollection { fileName });
+                Clipboard.SetFileDropList(new StringCollection {fileName});
                 PromptHelper.Instance.Prompt = fileName;
             }
         }
@@ -387,13 +405,11 @@ namespace WpfViews.Windows
 
                 if (rectangle != null)
                 {
-                    var solidColorBrush = (SolidColorBrush) Application.Current.TryFindResource("AccentColorBrush");
-
                     var uiRectangle = new System.Windows.Shapes.Rectangle
                     {
                         Width = rectangle.Value.Width * _canvasScreenWidthRatio,
                         Height = rectangle.Value.Height * _canvasScreenHeightRatio,
-                        Fill = solidColorBrush,
+                        Fill = (SolidColorBrush) Application.Current.TryFindResource("AccentColorBrush"),
                         StrokeThickness = 2,
                         Stroke = new SolidColorBrush(Colors.Black),
                         Opacity = 0.3,
@@ -401,17 +417,143 @@ namespace WpfViews.Windows
                         {
                             ItemsSource = new List<MenuItem>
                             {
-                                new MenuItem {Header = "复制小图", Command = _viewModel.CopyTargetBitmapCommand, CommandParameter = _viewModel.SelectedBitmapInfo}
+                                new MenuItem
+                                {
+                                    Header = "复制小图", Command = _viewModel.CopyTargetBitmapCommand,
+                                    CommandParameter = _viewModel.SelectedBitmapInfo
+                                }
                             }
                         }
                     };
-
 
                     Canvas.SetLeft(uiRectangle, rectangle.Value.X * _canvasScreenWidthRatio);
                     Canvas.SetTop(uiRectangle, rectangle.Value.Y * _canvasScreenHeightRatio);
                     Sketchpad.Children.Add(uiRectangle);
                 }
             });
+        }
+
+        private void StartPaintButton_OnChecked(object sender, RoutedEventArgs e)
+        {
+            _viewModel.SelectedBitmapInfo = null;
+
+            Canvas.SetLeft(_paintRectangle, -5);
+            Canvas.SetTop(_paintRectangle, -5);
+            Sketchpad.Children.Add(_paintRectangle);
+        }
+
+        private void StartButton_OnUnchecked(object sender, RoutedEventArgs e)
+        {
+            _startPaintPoint = null;
+            Sketchpad.Children.Clear();
+            _paintRectangle.Width = 2;
+            _paintRectangle.Height = 2;
+        }
+
+        private void Sketchpad_OnMouseMove(object sender, MouseEventArgs e)
+        {
+            if (_viewModel.StartPaint)
+            {
+                var point = Mouse.GetPosition(Sketchpad);
+
+                if (point.X >= 0 && point.Y >= 0 && point.X <= Sketchpad.ActualWidth &&
+                    point.Y <= Sketchpad.ActualHeight)
+                {
+                    if (_startPaintPoint == null)
+                    {
+                        Canvas.SetLeft(_paintRectangle, point.X - 2);
+                        Canvas.SetTop(_paintRectangle, point.Y - 2);
+                    }
+                    else
+                    {
+                        var width = point.X - _startPaintPoint.Value.X;
+                        var height = point.Y - _startPaintPoint.Value.Y;
+
+                        if (width < 0)
+                        {
+                            Canvas.SetLeft(_paintRectangle, _startPaintPoint.Value.X + width);
+                        }
+                        else
+                        {
+                            Canvas.SetLeft(_paintRectangle, _startPaintPoint.Value.X);
+                        }
+
+                        if (height < 0)
+                        {
+                            Canvas.SetTop(_paintRectangle, _startPaintPoint.Value.Y + height);
+                        }
+                        else
+                        {
+                            Canvas.SetTop(_paintRectangle, _startPaintPoint.Value.Y);
+                        }
+
+                        _paintRectangle.Width = Math.Abs(width);
+                        _paintRectangle.Height = Math.Abs(height);
+                    }
+                }
+            }
+        }
+
+        private void Sketchpad_OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (_viewModel.StartPaint)
+            {
+                var point = Mouse.GetPosition(Sketchpad);
+
+                if (_startPaintPoint == null)
+                {
+                    if (point.X >= 0 && point.Y >= 0 && point.X <= Sketchpad.ActualWidth &&
+                        point.Y <= Sketchpad.ActualHeight)
+                    {
+                        _startPaintPoint = point;
+                    }
+                }
+                else
+                {
+                    var locationPoint = _startPaintPoint.Value;
+
+                    var width = point.X - _startPaintPoint.Value.X;
+                    var height = point.Y - _startPaintPoint.Value.Y;
+
+                    if (width < 0)
+                    {
+                        locationPoint.X = _startPaintPoint.Value.X + width;
+                    }
+                    else
+                    {
+                        locationPoint.X = _startPaintPoint.Value.X;
+                    }
+
+                    if (height < 0)
+                    {
+                        locationPoint.Y = _startPaintPoint.Value.Y + height;
+                    }
+                    else
+                    {
+                        locationPoint.Y = _startPaintPoint.Value.Y;
+                    }
+
+                    var rectangle = new Rectangle((int) (locationPoint.X / _canvasScreenWidthRatio),
+                        (int) (locationPoint.Y / _canvasScreenHeightRatio),
+                        (int) Math.Abs(width / _canvasScreenWidthRatio),
+                        (int) Math.Abs(height / _canvasScreenHeightRatio));
+
+                    //保存图片
+                    using (var bitmap = _viewModel.SelectedScreenInfo.CopyBitmap())
+                    using (var subBitmap = bitmap.Clone(rectangle, bitmap.PixelFormat))
+                    {
+                        var path = BitmapHelper.SaveFile(subBitmap);
+
+                        var targetBitmapInfo = new TargetBitmapInfo(path);
+                        targetBitmapInfo.Init();
+                        _viewModel.BitmapInfos.Add(targetBitmapInfo);
+                        _viewModel.SelectedBitmapInfo = targetBitmapInfo;
+                    }
+
+                    //结束画图
+                    _viewModel.StartPaint = false;
+                }
+            }
         }
     }
 }

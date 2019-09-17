@@ -4,7 +4,9 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -42,6 +44,8 @@ namespace CoreFx.ViewModels
 
         public MvxCommand<TargetBitmapInfo> CopyTargetBitmapCommand { get; }
 
+        public MvxCommand<TargetBitmapInfo> DeleteTargetBitmapCommand { get; }
+
         public bool UseBuffer { get; set; }
 
         public int Buffer { get; set; } = 10;
@@ -51,6 +55,10 @@ namespace CoreFx.ViewModels
         public bool IsBusy { get; set; }
 
         public bool MouseEnter { get; set; }
+
+        public bool StartPaint { get; set; }
+
+        public bool BitMapTabItemIsSelected { get; set; }
 
         public int CopyBitmapToClipboardIndex { get; set; } = 1;
 
@@ -72,6 +80,7 @@ namespace CoreFx.ViewModels
             CopyColumnCommand = new MvxCommand<ColorInfo>(CopyColumnCommandHandler);
             AddPictureFile = new MvxCommand(AddPictureFileHandler);
             CopyTargetBitmapCommand = new MvxCommand<TargetBitmapInfo>(CopyTargetBitmapCommandHandler);
+            DeleteTargetBitmapCommand = new MvxCommand<TargetBitmapInfo>(DeleteTargetBitmapCommandHandler);
 
             Task.Run(async () => { await Initialize(); });
         }
@@ -198,6 +207,18 @@ namespace CoreFx.ViewModels
             PromptHelper.Instance.Prompt = targetBitmapInfo.FilePath;
         }
 
+        private void DeleteTargetBitmapCommandHandler(TargetBitmapInfo targetBitmapInfo)
+        {
+            BitmapInfos.Remove(targetBitmapInfo);
+            targetBitmapInfo.Dispose();
+
+            if (targetBitmapInfo.FilePath.StartsWith(AppDomain.CurrentDomain.BaseDirectory) &&
+                File.Exists(targetBitmapInfo.FilePath))
+            {
+                File.Delete(targetBitmapInfo.FilePath);
+            }
+        }
+
         private void OnSelectedScreenInfoChanged()
         {
             CaptureCommandHandler(false);
@@ -231,6 +252,11 @@ namespace CoreFx.ViewModels
         private void OnShowTaskBarChanged()
         {
             CaptureCommandHandler(true);
+        }
+
+        private void OnBitMapTabItemIsSelectedChanged()
+        {
+            StartPaint = false;
         }
     }
 }

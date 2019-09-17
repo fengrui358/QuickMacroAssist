@@ -11,7 +11,7 @@ using NLog;
 
 namespace ModelsFx
 {
-    public class TargetBitmapInfo
+    public class TargetBitmapInfo : IDisposable
     {
         private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
@@ -84,6 +84,12 @@ namespace ModelsFx
         public Bitmap CopyBitmap()
         {
             return Bitmap.Clone(new Rectangle(0, 0, Bitmap.Width, Bitmap.Height), Bitmap.PixelFormat);
+        }
+
+        public void Dispose()
+        {
+            BitmapImage = null;
+            Bitmap?.Dispose();
         }
     }
 }

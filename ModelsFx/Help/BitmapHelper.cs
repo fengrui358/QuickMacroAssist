@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Windows.Media.Imaging;
@@ -23,6 +24,21 @@ namespace ModelsFx.Help
             }
 
             return bitmapImage;
+        }
+
+        public static string SaveFile(Bitmap bitmap)
+        {
+            var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Pictures");
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+
+            path = Path.Combine(path, Guid.NewGuid().ToString("N"));
+            path += ".bmp";
+
+            bitmap.Save(path, ImageFormat.Bmp);
+            return path;
         }
     }
 }
