@@ -15,6 +15,7 @@ using System.Windows.Media;
 using CoreFx.ViewModels;
 using FrHello.NetLib.Core.Mvx;
 using ModelsFx;
+using ModelsFx.Help;
 using WpfViews.Controls;
 using Point = System.Drawing.Point;
 using Size = System.Drawing.Size;
@@ -372,6 +373,7 @@ namespace WpfViews.Windows
                 }
 
                 Clipboard.SetFileDropList(new StringCollection { fileName });
+                PromptHelper.Instance.Prompt = fileName;
             }
         }
 
@@ -394,8 +396,16 @@ namespace WpfViews.Windows
                         Fill = solidColorBrush,
                         StrokeThickness = 2,
                         Stroke = new SolidColorBrush(Colors.Black),
-                        Opacity = 0.3
+                        Opacity = 0.3,
+                        ContextMenu = new ContextMenu
+                        {
+                            ItemsSource = new List<MenuItem>
+                            {
+                                new MenuItem {Header = "复制小图", Command = _viewModel.CopyTargetBitmapCommand, CommandParameter = _viewModel.SelectedBitmapInfo}
+                            }
+                        }
                     };
+
 
                     Canvas.SetLeft(uiRectangle, rectangle.Value.X * _canvasScreenWidthRatio);
                     Canvas.SetTop(uiRectangle, rectangle.Value.Y * _canvasScreenHeightRatio);

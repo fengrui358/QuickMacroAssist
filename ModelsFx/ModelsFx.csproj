@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="ColorInfo.cs" />
     <Compile Include="Help\BitmapHelper.cs" />
+    <Compile Include="Help\PromptHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScreenInfo.cs" />
     <Compile Include="TargetBitmapInfo.cs" />
@@ -55,6 +56,9 @@
     <None Include="FodyWeavers.xml" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="FrHello.NetLib.Core">
+      <Version>1.0.27</Version>
+    </PackageReference>
     <PackageReference Include="FrHello.NetLib.Core.Windows">
       <Version>1.0.22</Version>
     </PackageReference>

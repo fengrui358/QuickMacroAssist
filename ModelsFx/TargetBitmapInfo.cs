@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -17,6 +16,8 @@ namespace ModelsFx
         private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
         private readonly string _filePath;
+
+        public string FilePath => _filePath;
 
         private Bitmap Bitmap { get; set; }
 

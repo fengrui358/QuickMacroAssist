@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
@@ -10,6 +11,7 @@ using System.Windows.Forms;
 using FrHello.NetLib.Core.Mvx;
 using FrHello.NetLib.Core.Windows.Windows;
 using ModelsFx;
+using ModelsFx.Help;
 using MvvmCross.Commands;
 using Clipboard = System.Windows.Clipboard;
 
@@ -37,6 +39,8 @@ namespace CoreFx.ViewModels
         public Rectangle? SelectedBitmapRectangle { get; set; }
 
         public MvxCommand AddPictureFile { get; }
+
+        public MvxCommand<TargetBitmapInfo> CopyTargetBitmapCommand { get; }
 
         public bool UseBuffer { get; set; }
 
@@ -67,6 +71,7 @@ namespace CoreFx.ViewModels
             CopyRowCommand = new MvxCommand<ColorInfo>(CopyRowCommandHandler);
             CopyColumnCommand = new MvxCommand<ColorInfo>(CopyColumnCommandHandler);
             AddPictureFile = new MvxCommand(AddPictureFileHandler);
+            CopyTargetBitmapCommand = new MvxCommand<TargetBitmapInfo>(CopyTargetBitmapCommandHandler);
 
             Task.Run(async () => { await Initialize(); });
         }
@@ -87,6 +92,7 @@ namespace CoreFx.ViewModels
                 $"await WindowsApi.ScreenApi.WaitColorAt({colorInfo.Point.X}, {colorInfo.Point.Y}, Color.FromArgb({colorInfo.Color.R}, {colorInfo.Color.G}, {colorInfo.Color.B}));";
 
             Clipboard.SetDataObject(str);
+            PromptHelper.Instance.Prompt = str;
         }
 
         private void CopyAreaCommandHandler(ColorInfo colorInfo)
@@ -95,6 +101,7 @@ namespace CoreFx.ViewModels
                 $"await WindowsApi.ScreenApi.WaitScanColorLocation(Color.FromArgb({colorInfo.Color.R}, {colorInfo.Color.G}, {colorInfo.Color.B}), WindowsApi.ScreenApi.AllScreens[{SelectedScreenInfo.Index}], new Rectangle({colorInfo.Point.X - Buffer / 2}, {colorInfo.Point.Y - Buffer / 2}, {Buffer}, {Buffer}));";
 
             Clipboard.SetDataObject(str);
+            PromptHelper.Instance.Prompt = str;
         }
 
         private void CopyRowCommandHandler(ColorInfo colorInfo)
@@ -103,6 +110,7 @@ namespace CoreFx.ViewModels
                 $"await WindowsApi.ScreenApi.WaitScanColorLocation(Color.FromArgb({colorInfo.Color.R}, {colorInfo.Color.G}, {colorInfo.Color.B}), WindowsApi.ScreenApi.AllScreens[{SelectedScreenInfo.Index}], WindowsApi.ScreenApi.AllScreens[{SelectedScreenInfo.Index}].GetScreenRow({colorInfo.Point.Y - Buffer / 2}, {Buffer}));";
 
             Clipboard.SetDataObject(str);
+            PromptHelper.Instance.Prompt = str;
         }
 
         private void CopyColumnCommandHandler(ColorInfo colorInfo)
@@ -111,6 +119,7 @@ namespace CoreFx.ViewModels
                 $"await WindowsApi.ScreenApi.WaitScanColorLocation(Color.FromArgb({colorInfo.Color.R}, {colorInfo.Color.G}, {colorInfo.Color.B}), WindowsApi.ScreenApi.AllScreens[{SelectedScreenInfo.Index}], WindowsApi.ScreenApi.AllScreens[{SelectedScreenInfo.Index}].GetScreenColumn({colorInfo.Point.X - Buffer / 2}, {Buffer}));";
 
             Clipboard.SetDataObject(str);
+            PromptHelper.Instance.Prompt = str;
         }
 
         private async void CaptureCommandHandler(bool notify)
@@ -178,6 +187,15 @@ namespace CoreFx.ViewModels
                     BitmapInfos.Add(targetBitmap);
                 }
             }
+        }
+
+        private void CopyTargetBitmapCommandHandler(TargetBitmapInfo targetBitmapInfo)
+        {
+            Clipboard.SetFileDropList(new StringCollection
+            {
+                targetBitmapInfo.FilePath
+            });
+            PromptHelper.Instance.Prompt = targetBitmapInfo.FilePath;
         }
 
         private void OnSelectedScreenInfoChanged()
