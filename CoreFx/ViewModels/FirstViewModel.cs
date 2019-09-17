@@ -44,6 +44,8 @@ namespace CoreFx.ViewModels
 
         public MvxCommand<TargetBitmapInfo> CopyTargetBitmapCommand { get; }
 
+        public MvxCommand<TargetBitmapInfo> CopyCodeCommand { get; }
+
         public MvxCommand<TargetBitmapInfo> DeleteTargetBitmapCommand { get; }
 
         public bool UseBuffer { get; set; }
@@ -80,6 +82,7 @@ namespace CoreFx.ViewModels
             CopyColumnCommand = new MvxCommand<ColorInfo>(CopyColumnCommandHandler);
             AddPictureFile = new MvxCommand(AddPictureFileHandler);
             CopyTargetBitmapCommand = new MvxCommand<TargetBitmapInfo>(CopyTargetBitmapCommandHandler);
+            CopyCodeCommand = new MvxCommand<TargetBitmapInfo>(CopyCodeCommandHandler);
             DeleteTargetBitmapCommand = new MvxCommand<TargetBitmapInfo>(DeleteTargetBitmapCommandHandler);
 
             Task.Run(async () => { await Initialize(); });
@@ -205,6 +208,15 @@ namespace CoreFx.ViewModels
                 targetBitmapInfo.FilePath
             });
             PromptHelper.Instance.Prompt = targetBitmapInfo.FilePath;
+        }
+
+        private void CopyCodeCommandHandler(TargetBitmapInfo targetBitmapInfo)
+        {
+            var str =
+                $"await WindowsApi.ScreenApi.WaitScanBitmapLocation(new Bitmap(\"Pictures\\\\{Path.GetFileName(targetBitmapInfo.FilePath)}\"), WindowsApi.ScreenApi.AllScreens[{SelectedScreenInfo.Index}]);";
+
+            Clipboard.SetDataObject(str);
+            PromptHelper.Instance.Prompt = str;
         }
 
         private void DeleteTargetBitmapCommandHandler(TargetBitmapInfo targetBitmapInfo)

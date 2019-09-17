@@ -57,7 +57,7 @@
                       Command="{Binding DataContext.CopyTargetBitmapCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
                       CommandParameter="{Binding}" />
             <MenuItem Header="复制代码"
-                      Command="{Binding DataContext.CopyTargetBitmapCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                      Command="{Binding DataContext.CopyCodeCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
                       CommandParameter="{Binding}" />
             <MenuItem Header="删除"
                       Command="{Binding DataContext.DeleteTargetBitmapCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
